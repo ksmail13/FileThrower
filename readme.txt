@@ -1,1 +1,1 @@
-bin/bash: wq: command not found
+/bin/bash: qw: command not found
