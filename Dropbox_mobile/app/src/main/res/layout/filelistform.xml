@@ -8,6 +8,8 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".Dropbox"
 
+
+
     >
 
 
@@ -15,21 +17,48 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="wrap_content"
-        android:layout_height="450dp"
-
+        android:layout_height="430dp"
+        android:layout_below="@+id/linearLayout3"
         android:id="@+id/linearLayout"
-        android:weightSum="1">
+
+        android:layout_alignParentEnd="false">
         <ListView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/filelist" />
+            android:id="@+id/filelist"
+            android:listSelector="#FFFFFFFF"
+
+            android:choiceMode="singleChoice" />
     </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/linearLayout3"
+        android:layout_centerHorizontal="true"
 
+
+        >
+
+
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Refresh"
+            android:textSize="12dp"
+            android:id="@+id/refresh_button" />
+    </LinearLayout>
+
+
+    <LinearLayout
+
+        android:id="@+id/linearLayout2"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/linearLayout"
         android:layout_centerHorizontal="true">
 
@@ -38,28 +67,30 @@
             android:layout_height="wrap_content"
             android:text="Download"
             android:textSize="15dp"
-            android:id="@+id/button" />
+            android:id="@+id/download_button" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Upload"
             android:textSize="15dp"
-            android:id="@+id/button2" />
+            android:id="@+id/upload_button" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Rename"
             android:textSize="15dp"
-            android:id="@+id/button3" />
+            android:id="@+id/rename_button" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Delete"
             android:textSize="15dp"
-            android:id="@+id/button4" />
+            android:id="@+id/delete_button" />
+
+
     </LinearLayout>
 
 </RelativeLayout>

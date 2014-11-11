@@ -11,7 +11,7 @@
     <EditText
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:id="@+id/editText"
+        android:id="@+id/input_id"
         android:layout_marginTop="150dp"
         android:layout_centerHorizontal="true"
         />
@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:inputType="textPassword"
         android:ems="15"
-        android:id="@+id/editText2"
+        android:id="@+id/input_name"
         android:layout_marginTop="200dp"
         android:layout_centerHorizontal="true"
          />
@@ -32,7 +32,8 @@
         android:text="Login"
         android:id="@+id/login_button"
         android:layout_marginTop="150dp"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:textSize="18dp" />
 
     <Button
         android:layout_width="70dp"
@@ -42,24 +43,24 @@
         android:layout_marginTop="200dp"
         android:layout_alignParentEnd="true"
 
-        />
+        android:textSize="18dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="ID"
-        android:id="@+id/textView"
+        android:id="@+id/text_name"
         android:layout_marginTop="160dp"
         android:layout_alignParentStart="true"
 
-         />
+        android:textSize="20dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="PW"
-        android:id="@+id/textView2"
+        android:id="@+id/text_id"
         android:layout_marginTop="210dp"
         android:layout_alignParentStart="true"
-        />
+        android:textSize="20dp" />
 </RelativeLayout>
