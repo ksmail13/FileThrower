@@ -12,15 +12,31 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="wrap_content"
-        android:layout_height="450dp"
-
+        android:layout_height="430dp"
+        android:layout_below="@+id/linearLayout3"
         android:id="@+id/linearLayout2">
 
         <ListView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:listSelector="#FFFFFFFF"
+            android:id="@+id/grouplist" />
+    </LinearLayout>
 
-            android:id="@+id/listView" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/linearLayout3"
+        android:layout_centerHorizontal="true"
+        >
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Refresh"
+            android:textSize="12dp"
+            android:id="@+id/refresh_button" />
     </LinearLayout>
 
     <LinearLayout
@@ -52,20 +68,20 @@
             android:layout_height="wrap_content"
             android:text="Delete"
             android:textSize="15dp"
-            android:id="@+id/button3" />
+            android:id="@+id/delete_button" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Invite"
             android:textSize="15dp"
-            android:id="@+id/button4" />
+            android:id="@+id/invite_button" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Exit"
             android:textSize="15dp"
-            android:id="@+id/button5" />
+            android:id="@+id/exit_button" />
     </LinearLayout>
 </RelativeLayout>
