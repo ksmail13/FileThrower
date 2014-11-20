@@ -5,10 +5,8 @@ import dropbox.common.Message;
 import dropbox.common.MessageWrapper;
 import dropbox.server.Util.ByteConverter;
 import dropbox.server.Util.Logger;
-import jdk.nashorn.internal.runtime.Logging;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -188,29 +186,21 @@ public class RelayServer {
             Logger.logging(msg.msg);
 
             switch (msg.messageType) {
-                case FileUpload:
+                // file request
+                case FileUpload: case FileSync:
                     break;
-                case FileSync:
+                // account request
+                case CreateAccount: case ChangePassword:
                     break;
-                case CreateAccount:
-                    break;
-                case ChangePassword:
-                    break;
-                case CreateGroup:
-                    break;
-                case AddMember:
-                    break;
-                case ExitGroup:
-                    break;
-                case ChangePermission:
-                    break;
-                case DeleteGroup:
+                // group request
+                case CreateGroup: case AddMember: case ExitGroup:
+                case ChangePermission: case DeleteGroup:
+
                     break;
             }
 
         } catch (IOException e) {
             Logger.errorLogging(e);
-            //e.printStackTrace();
         } catch (ClassNotFoundException cnfe) {
             Logger.errorLogging(cnfe);
         }

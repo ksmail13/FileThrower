@@ -25,17 +25,27 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="RelayServer.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Main.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/dropbox/server/Main.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.21538462" vertical-offset="0" max-vertical-offset="975">
+              <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="RelayServer.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/dropbox/server/Communicate/RelayServer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.5806112" vertical-offset="2205" max-vertical-offset="3510">
-              <caret line="47" column="39" selection-start-line="47" selection-start-column="39" selection-end-line="47" selection-end-column="39" />
+            <state vertical-scroll-proportion="18.307692" vertical-offset="746" max-vertical-offset="3360">
+              <caret line="18" column="36" selection-start-line="18" selection-start-column="36" selection-end-line="18" selection-end-column="36" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#959#960#0" expanded="true" />
-                <element signature="e#1012#1013#0" expanded="true" />
-                <element signature="e#1070#1071#0" expanded="true" />
-                <element signature="e#1117#1118#0" expanded="true" />
+                <element signature="e#886#887#0" expanded="true" />
+                <element signature="e#939#940#0" expanded="true" />
+                <element signature="e#997#998#0" expanded="true" />
+                <element signature="e#1044#1045#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -45,7 +55,7 @@
         <entry file="file://$PROJECT_DIR$/src/dropbox/common/MessageType.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="135">
-              <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+              <caret line="2" column="12" selection-start-line="2" selection-start-column="12" selection-end-line="2" selection-end-column="12" />
               <folding />
             </state>
           </provider>
@@ -86,8 +96,18 @@
       <file leaf-file-name="ServerManager.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/dropbox/server/Communicate/ServerManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="225">
-              <caret line="5" column="3" selection-start-line="5" selection-start-column="3" selection-end-line="5" selection-end-column="3" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="585">
+              <caret line="27" column="16" selection-start-line="27" selection-start-column="16" selection-end-line="27" selection-end-column="16" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="JSONable.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/dropbox/common/JSONable.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="240">
+              <caret line="8" column="32" selection-start-line="8" selection-start-column="32" selection-end-line="8" selection-end-column="32" />
               <folding />
             </state>
           </provider>
@@ -106,22 +126,32 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="FileServer.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/dropbox/server/Communicate/FileServer.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="210">
+              <caret line="6" column="25" selection-start-line="6" selection-start-column="25" selection-end-line="6" selection-end-column="25" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
     </leaf>
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/dropbox/server/Communicate/FileServer.java" />
-        <option value="$PROJECT_DIR$/src/dropbox/server/Communicate/ServerManager.java" />
         <option value="$PROJECT_DIR$/src/dropbox/server/Communicate/MessageWrapper.java" />
         <option value="$PROJECT_DIR$/src/dropbox/common/MessageType.java" />
         <option value="$PROJECT_DIR$/src/dropbox/common/JSONable.java" />
-        <option value="$PROJECT_DIR$/src/dropbox/server/Main.java" />
-        <option value="$PROJECT_DIR$/src/dropbox/server/Communicate/RelayServer.java" />
         <option value="$PROJECT_DIR$/src/dropbox/common/MessageWrapper.java" />
         <option value="$PROJECT_DIR$/src/dropbox/server/Util/Logger.java" />
         <option value="$PROJECT_DIR$/src/dropbox/server/Util/ByteConverter.java" />
         <option value="$PROJECT_DIR$/src/dropbox/common/Message.java" />
+        <option value="$PROJECT_DIR$/src/dropbox/server/Communicate/RelayServer.java" />
+        <option value="$PROJECT_DIR$/src/dropbox/server/Main.java" />
+        <option value="$PROJECT_DIR$/src/dropbox/server/Communicate/ServerManager.java" />
       </list>
     </option>
   </component>
@@ -564,10 +594,10 @@
           <caret line="158" column="75" selection-start-line="158" selection-start-column="75" selection-end-line="158" selection-end-column="75" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#959#960#0" expanded="true" />
-            <element signature="e#1012#1013#0" expanded="true" />
-            <element signature="e#1070#1071#0" expanded="true" />
-            <element signature="e#1117#1118#0" expanded="true" />
+            <element signature="e#886#887#0" expanded="true" />
+            <element signature="e#939#940#0" expanded="true" />
+            <element signature="e#997#998#0" expanded="true" />
+            <element signature="e#1044#1045#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -654,10 +684,10 @@
           <caret line="126" column="26" selection-start-line="126" selection-start-column="26" selection-end-line="126" selection-end-column="26" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#959#960#0" expanded="true" />
-            <element signature="e#1012#1013#0" expanded="true" />
-            <element signature="e#1070#1071#0" expanded="true" />
-            <element signature="e#1117#1118#0" expanded="true" />
+            <element signature="e#886#887#0" expanded="true" />
+            <element signature="e#939#940#0" expanded="true" />
+            <element signature="e#997#998#0" expanded="true" />
+            <element signature="e#1044#1045#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -713,10 +743,10 @@
           <caret line="16" column="24" selection-start-line="16" selection-start-column="24" selection-end-line="16" selection-end-column="24" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#959#960#0" expanded="true" />
-            <element signature="e#1012#1013#0" expanded="true" />
-            <element signature="e#1070#1071#0" expanded="true" />
-            <element signature="e#1117#1118#0" expanded="true" />
+            <element signature="e#886#887#0" expanded="true" />
+            <element signature="e#939#940#0" expanded="true" />
+            <element signature="e#997#998#0" expanded="true" />
+            <element signature="e#1044#1045#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -789,14 +819,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/dropbox/common/JSONable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="240">
-          <caret line="8" column="32" selection-start-line="8" selection-start-column="32" selection-end-line="8" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_05.jdk/Contents/Home/src.zip!/java/io/InputStream.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.64102566" vertical-offset="2915" max-vertical-offset="5220">
@@ -817,22 +839,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.26229507" vertical-offset="1746" max-vertical-offset="2295">
           <caret line="139" column="23" selection-start-line="139" selection-start-column="23" selection-end-line="139" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/dropbox/server/Communicate/FileServer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="210">
-          <caret line="6" column="25" selection-start-line="6" selection-start-column="25" selection-end-line="6" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/dropbox/server/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="300">
-          <caret line="10" column="30" selection-start-line="10" selection-start-column="30" selection-end-line="10" selection-end-column="30" />
           <folding />
         </state>
       </provider>
@@ -901,14 +907,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/dropbox/server/Communicate/ServerManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="225">
-          <caret line="5" column="3" selection-start-line="5" selection-start-column="3" selection-end-line="5" selection-end-column="3" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/dropbox/server/Util/Logger.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="600">
@@ -917,30 +915,6 @@
             <element signature="e#1184#1185#0" expanded="true" />
             <element signature="e#1216#1217#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/dropbox/common/Message.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="255">
-          <caret line="7" column="45" selection-start-line="7" selection-start-column="45" selection-end-line="9" selection-end-column="11" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/dropbox/server/Util/ByteConverter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="450">
-          <caret line="22" column="5" selection-start-line="22" selection-start-column="5" selection-end-line="22" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/dropbox/common/MessageType.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="135">
-          <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -954,17 +928,73 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/dropbox/server/Util/ByteConverter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="450">
+          <caret line="22" column="5" selection-start-line="22" selection-start-column="5" selection-end-line="22" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/dropbox/common/Message.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="255">
+          <caret line="7" column="45" selection-start-line="7" selection-start-column="45" selection-end-line="9" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/dropbox/common/MessageType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="135">
+          <caret line="2" column="12" selection-start-line="2" selection-start-column="12" selection-end-line="2" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/dropbox/common/JSONable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="240">
+          <caret line="8" column="32" selection-start-line="8" selection-start-column="32" selection-end-line="8" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/dropbox/server/Communicate/FileServer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="210">
+          <caret line="6" column="25" selection-start-line="6" selection-start-column="25" selection-end-line="6" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/dropbox/server/Communicate/RelayServer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.5806112" vertical-offset="2205" max-vertical-offset="3510">
-          <caret line="47" column="39" selection-start-line="47" selection-start-column="39" selection-end-line="47" selection-end-column="39" />
+        <state vertical-scroll-proportion="18.307692" vertical-offset="746" max-vertical-offset="3360">
+          <caret line="18" column="36" selection-start-line="18" selection-start-column="36" selection-end-line="18" selection-end-column="36" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#959#960#0" expanded="true" />
-            <element signature="e#1012#1013#0" expanded="true" />
-            <element signature="e#1070#1071#0" expanded="true" />
-            <element signature="e#1117#1118#0" expanded="true" />
+            <element signature="e#886#887#0" expanded="true" />
+            <element signature="e#939#940#0" expanded="true" />
+            <element signature="e#997#998#0" expanded="true" />
+            <element signature="e#1044#1045#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/dropbox/server/Communicate/ServerManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="585">
+          <caret line="27" column="16" selection-start-line="27" selection-start-column="16" selection-end-line="27" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/dropbox/server/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.21538462" vertical-offset="0" max-vertical-offset="975">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
