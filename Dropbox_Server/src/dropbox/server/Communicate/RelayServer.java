@@ -1,9 +1,14 @@
 package dropbox.server.Communicate;
 
+import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
+import dropbox.common.Message;
 import dropbox.common.MessageWrapper;
+import dropbox.server.Util.ByteConverter;
 import dropbox.server.Util.Logger;
+import jdk.nashorn.internal.runtime.Logging;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -19,41 +24,6 @@ import java.util.Iterator;
  * 중계 서버 인스턴스는 하나의 프로세스에 하나만 존재한다.
  */
 public class RelayServer {
-    // static
-    private static RelayServer instance = null;
-
-    /**
-     * 아이피와 포트 정보를 기반으로 서버 인스턴스를 가져온다.
-     * @param address 아이피 주소
-     * @param port 포트 번호
-     * @return 서버 인스턴스
-     */
-    public static RelayServer getInstance(String address, int port) {
-        getInstance(new InetSocketAddress(address, port));
-
-        return instance;
-    }
-
-    /**
-     * 소켓 address bind클래스를 사용해 객체를 초기화한다.
-     * @param socketAddr 주소 데이터
-     * @return 서버 인스턴스
-     */
-    public static RelayServer getInstance(InetSocketAddress socketAddr) {
-        if(instance == null) {
-            instance = new RelayServer(socketAddr);
-        }
-
-        return instance;
-    }
-
-    /**
-     * 생성된 인스턴스를 불러올 때 사용한다.
-     * @return 서버 인스턴스
-     */
-    public static RelayServer getInstance() {
-        return instance;
-    }
 
     // static end
 
@@ -61,7 +31,11 @@ public class RelayServer {
     private ServerSocketChannel serverSockChennel = null;
     private ServerSocket serverSocket = null;
 
-    protected RelayServer(InetSocketAddress serverSocketAddress) {
+    RelayServer(String ip, int port){
+        this(new InetSocketAddress(ip, port));
+    }
+
+    RelayServer(InetSocketAddress serverSocketAddress) {
         initServer(serverSocketAddress);
     }
 
@@ -94,6 +68,7 @@ public class RelayServer {
 
         try {
             while(true) {
+//                Logger.logging("selecting!");
                 selector.select();
                 Iterator<SelectionKey> kit = selector.selectedKeys().iterator();
                 while (kit.hasNext()) {
@@ -102,7 +77,7 @@ public class RelayServer {
                         connectAcceptClient(selectKey);
                     }
                     else if(selectKey.isReadable()){
-
+                        receiveMessage(selectKey);
                     }
                     kit.remove();
                 }
@@ -125,6 +100,7 @@ public class RelayServer {
         try {
             SocketChannel sc = serverChannel.accept();
             registerChannel(sc, SelectionKey.OP_READ);
+            Logger.logging("Connect form "+sc.getLocalAddress());
         }
         catch(ClosedChannelException cce) {
             Logger.errorLogging("Selector was closed", cce);
@@ -155,26 +131,98 @@ public class RelayServer {
     }
 
     private void receiveMessage(SelectionKey key) {
+        Logger.logging("recv start");
         SocketChannel sc = (SocketChannel)key.channel();
-        ByteBuffer buffer = ByteBuffer.allocateDirect(MessageWrapper.MESSAGE_SIZE);
+        // 메모리를 직접할당해 가비지 컬렉션에 잡히지 않게 처리해
+        // 나중에 full gc에 걸리는 시간을 줄인다.
+        ByteBuffer buffer = ByteBuffer.allocate(MessageWrapper.MESSAGE_SIZE);
+
         try {
-            int readbytes = sc.read(buffer);
-            Logger.logging("receive message from" + ((SocketChannel) key.channel()).getLocalAddress());
+            int read =0;
+            int readbytes = 0;
+            int messageSize = 1000000;
+            boolean firstread = true;
+
+            // 현재 소켓의 수신이 가능하고 전체 메시지 길이 보다 전체
+            // 데이터를 수신한다.
+            readloop:
+            while(key.isReadable() && readbytes < messageSize) {
+                read = sc.read(buffer);
+                // 소켓 연결이 끊어진 상태라면 정식으로 연결을 종료한다.
+                if (read==-1) {
+                    disconnect(sc);
+                    return;
+                }
+                // 수신한 데이터 체크
+                readbytes += read;
+                // 첫수신이면 전체 메시지 길이가 얼마나 되는지 확인한다.
+                if(firstread) {
+                    byte[] temp = buffer.array();
+                    messageSize = ByteConverter.byteArrayToInt(temp[0], temp[1], temp[2], temp[3]);
+                    firstread = false;
+                }
+
+                Logger.debuglogging("receive read"+read+"  readbytes = " + readbytes + " messagesize "+messageSize);
+            }
+
+            // 수신한 데이터를 파싱한다.
+            parse(buffer);
+            buffer.clear();
+
         } catch(IOException ioe) {
-            try{
-                sc.close();
-            } catch(IOException ioebyclose) { }
-
-            //TODO : logout process
+            Logger.errorLogging(ioe);
         }
-
-        parse(buffer);
-
-        // 버퍼 사용이 끝났으므로
-        buffer.clear();
     }
 
+    //private void parse(InputStream inputStream) {
     private void parse(ByteBuffer buffer) {
+        try {
 
+            int offset = buffer.arrayOffset();
+            byte[] buf = buffer.array();
+
+            ObjectInputStream ois = new ObjectInputStream(new ByteInputStream(buf,4, buf.length));
+            Message msg = (Message)ois.readObject();
+
+            Logger.logging(msg.messageType+"");
+            Logger.logging(msg.msg);
+
+            switch (msg.messageType) {
+                case FileUpload:
+                    break;
+                case FileSync:
+                    break;
+                case CreateAccount:
+                    break;
+                case ChangePassword:
+                    break;
+                case CreateGroup:
+                    break;
+                case AddMember:
+                    break;
+                case ExitGroup:
+                    break;
+                case ChangePermission:
+                    break;
+                case DeleteGroup:
+                    break;
+            }
+
+        } catch (IOException e) {
+            Logger.errorLogging(e);
+            //e.printStackTrace();
+        } catch (ClassNotFoundException cnfe) {
+            Logger.errorLogging(cnfe);
+        }
+    }
+
+    /**
+     * 소켓연결을 끊는다.
+     * @param socketChannel
+     * @throws IOException
+     */
+    private void disconnect(SocketChannel socketChannel) throws IOException {
+        Logger.logging("user "+socketChannel.getLocalAddress()+" is disconnect");
+        socketChannel.close();
     }
 }

@@ -38,4 +38,10 @@ public class Logger {
         }
         target.println();
     }
+
+    public static void debuglogging(String message) {
+        logging(message);
+    }
+
+
 }
