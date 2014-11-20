@@ -6,9 +6,16 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
+import org.json.simple.JSONObject;
+
 public class SignUpFrame extends JFrame{
 	private SignUpFrame sf;
 	private SignUpPanel signUpPanel;
+	
+	private JTextField idField;
+	private JPasswordField passwdField;
+	private JPasswordField rePasswdField;
+	private JTextField emailField;
 	
 	public SignUpFrame(){
 		sf=this;
@@ -28,17 +35,17 @@ public class SignUpFrame extends JFrame{
 			Box rightBox = Box.createVerticalBox();
 			
 			JLabel idLabel = new JLabel("ID");
-			JTextField idField = new JTextField(15);
+			idField = new JTextField(15);
 			JButton dupChkButton = new JButton("Check avail.");
 			dupChkButton.addActionListener(this);
 			JLabel passwdLabel = new JLabel("Password");
-			JPasswordField passwdField = new JPasswordField(15);
+			passwdField = new JPasswordField(15);
 			JLabel rePasswdLabel = new JLabel("Re-Password");
-			JPasswordField rePasswdField = new JPasswordField(15);
+			rePasswdField = new JPasswordField(15);
 			
 			
 			JLabel emailLabel = new JLabel("E-Mail");
-			JTextField emailField = new JTextField(15);
+			emailField = new JTextField(15);
 			
 			JButton sendButton = new JButton("Send");
 			sendButton.addActionListener(this);
@@ -81,6 +88,25 @@ public class SignUpFrame extends JFrame{
 			// TODO Auto-generated method stub
 			if(e.getActionCommand().equals("Send")){
 				System.out.println("send click");
+				
+				String inputID = idField.getText().trim();
+				String inputPW = passwdField.getText().trim();
+				String inputRePW = rePasswdField.getText().trim();		
+				String inputEmail = emailField.getText().trim();
+				
+				if(!inputPW.equals(inputRePW)){
+					JOptionPane.showMessageDialog(null, "Type the same password in both Password and Re-Password");
+					return;
+				}
+				
+				JSONObject signUpJObj = new JSONObject();
+				
+				signUpJObj.put("ID", inputID);
+				signUpJObj.put("PW", inputPW);
+				signUpJObj.put("Email", inputEmail);
+				
+				System.out.println(signUpJObj);
+				
 			}
 			else if(e.getActionCommand().equals("Cancel")){
 				System.out.println("cancel click");

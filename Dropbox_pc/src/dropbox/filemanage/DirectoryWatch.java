@@ -26,7 +26,7 @@ public class DirectoryWatch {
 		num = 0;
 		for (File file : files) {
 			if (file.listFiles() != null) {
-				watchThread[num] = new WatchThread(file.toPath());
+				watchThread[num] = new WatchThread(file.toPath(), file.getName());
 				num++;
 			}
 		}
@@ -63,7 +63,7 @@ public class DirectoryWatch {
 		}
 	}
 
-	public void testForDirectoryChange(Path myDir) {
+	public void testForDirectoryChange(Path myDir, String groupName) {
 		while (true) {
 			try {
 				WatchService watcher = myDir.getFileSystem().newWatchService();
@@ -76,16 +76,16 @@ public class DirectoryWatch {
 				List<WatchEvent<?>> events = watckKey.pollEvents();
 				for (WatchEvent event : events) {
 					if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
-						System.out.println("Created: " + myDir + "/"
-								+ event.context().toString());
+						System.out.println("Group : " + groupName + " Created: " + myDir + "/" + event.context().toString());
+						new FileSynchronize(event, groupName, myDir, event.context().toString().trim());
 					}
 					if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
-						System.out.println("Delete: " + myDir + "/"
-								+ event.context().toString());
+						System.out.println("Group : " + groupName + " Delete: " + myDir + "/" + event.context().toString());
+						new FileSynchronize(event, groupName, myDir, event.context().toString().trim());
 					}
 					if (event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
-						System.out.println("Modify: " + myDir + "/"
-								+ event.context().toString());
+						System.out.println("Group : " + groupName + " Modify: " + myDir + "/" + event.context().toString());
+						new FileSynchronize(event, groupName, myDir, event.context().toString().trim());
 					}
 				}
 
@@ -97,13 +97,15 @@ public class DirectoryWatch {
 
 	class WatchThread extends Thread {
 		private Path dir;
-
-		public WatchThread(Path dir) {
+		private String groupName;
+		
+		public WatchThread(Path dir, String groupName) {
 			this.dir = dir;
+			this.groupName = groupName;
 		}
 
 		public void run() {
-			testForDirectoryChange(this.dir);
+			testForDirectoryChange(this.dir, this.groupName);
 		}
 	}
 }

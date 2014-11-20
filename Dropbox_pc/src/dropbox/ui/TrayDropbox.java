@@ -10,7 +10,7 @@ import javax.swing.*;
 import dropbox.filemanage.DirectoryWatch;
 
 public class TrayDropbox {
-	private static GroupFrame groupFrame;
+	private static ManagerFrame managerFrame;
 	private static DirectoryWatch directoryWatch;
 
 	private static MenuItem openItem;
@@ -18,11 +18,14 @@ public class TrayDropbox {
 	private static MenuItem turnOffItem;
 	private static MenuItem aboutItem;
 	private static MenuItem exitItem;
+	private static String id;
 
-	public TrayDropbox(File dir) {
-		groupFrame = new GroupFrame();
+	public TrayDropbox(File dir, String id) {
+		managerFrame = new ManagerFrame(id);
 		directoryWatch = new DirectoryWatch(dir);
 		directoryWatch.StartMonitoring();
+		this.id = id;
+		
 		createAndShowGUI();
 		turnOnItem.setEnabled(false);
 	}
@@ -63,18 +66,17 @@ public class TrayDropbox {
 
 		trayIcon.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null,
-						"This dialog box is run from System Tray");
+				JOptionPane.showMessageDialog(null, "This dialog box is run from System Tray");
 			}
 		});
 
 		openItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//groupFrame.setVisible(true);
-				groupFrame.show(true);
+				managerFrame.show(true);
 			}
 		});
-
+		
 		turnOnItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JOptionPane.showMessageDialog(null, "Turn On");
