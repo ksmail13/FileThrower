@@ -2,13 +2,17 @@ package com.dropbox.john.dropbox_mobile;
 
 import android.app.*;
 import android.content.DialogInterface;
+import android.net.Uri;
 import android.os.Bundle;
-
+import android.content.Intent;
 import java.util.*;
+
+import android.provider.MediaStore;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import java.util.ArrayList;
+import android.database.Cursor;
 
 import android.widget.*;
 
@@ -17,7 +21,9 @@ public class filelistform extends Activity implements OnClickListener {
     ArrayList<String> list;
     ArrayAdapter<String> adapter;
     ListView filelist;
-
+    String file_id=null;
+    String group_id="";
+    file_management fm = new file_management();
     Button download_button, upload_button, rename_button, delete_button,refresh_button;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,24 +48,24 @@ public class filelistform extends Activity implements OnClickListener {
         refresh_button = (Button) findViewById(R.id.refresh_button);
         refresh_button.setOnClickListener(this);
 
+        Intent intent = getIntent();
+        group_id = intent.getStringExtra("group_id");
+        System.out.println(group_id);
 
-
-        refreshList(1000);
+        refreshList();
     }
-    public void refreshList(int i) {
+    public void refreshList() {
 
         ArrayList<HashMap<String,String>> list =new ArrayList<HashMap<String, String>>();
         filelist = (ListView) findViewById(R.id.filelist);
 
-        String[] from = new String[] {"name","date"};
-        int[] to = new int[]{R.id.name_text,R.id.date_text};
+        String[] from = new String[] {"name","size","date","uploader"};
+        int[] to = new int[]{R.id.name_text,R.id.size_text,R.id.date_text,R.id.uploader_text};
 
-        for(;i<1100;i++) {
-            HashMap<String, String> item =   new HashMap<String, String>();
-            item.put("name", "aaa");
-            item.put("date",Integer.toString(i));
-            list.add(item);
-        }
+
+
+        list = fm.load_list();
+
 
 
         SimpleAdapter notes = new SimpleAdapter(this,list, R.layout.filelist, from,to);
@@ -75,8 +81,9 @@ public class filelistform extends Activity implements OnClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id)
         {
-            Toast toast = Toast.makeText(filelistform.this,((TextView) view.findViewById(R.id.date_text)).getText().toString(),Toast.LENGTH_SHORT);
-            toast.show();
+
+            file_id = ((TextView) view.findViewById(R.id.name_text)).getText().toString();
+
         }
     }
 
@@ -84,67 +91,118 @@ public class filelistform extends Activity implements OnClickListener {
         finish();
     }
 
+    private String getPath(Uri uri)
+    {
+        String res = null;
+        String[] projection = { MediaStore.Images.Media.DATA };
+        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+        if(cursor.moveToFirst()){
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            res = cursor.getString(column_index);
+        }
+        cursor.close();
+        return res;
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 1) {
+                Uri uri = intent.getData();
+                String path = getPath(uri);
+                System.out.println(path);
+            }
+
+        }
+    }
     @Override
     public void onClick(View v) {
         // TODO Auto-generated method stub
         int getId = v.getId();
         switch (getId) {
             case R.id.download_button:
+                if(file_id!=null) {
 
+
+                }
+                else {
+                    Toast toast = Toast.makeText(filelistform.this,"Choice File",Toast.LENGTH_SHORT);
+                    toast.show();
+                }
                 break;
             case R.id.upload_button:
+
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.setType("*/*");
+
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivityForResult(i, 1);
 
 
                 break;
             case R.id.delete_button:
-                AlertDialog.Builder alert3 = new AlertDialog.Builder(filelistform.this);
-                alert3.setTitle("Are you sure you want to delete?");
-                // Set an EditText view to get user input
+
+                if(file_id!=null) {
+
+                    AlertDialog.Builder alert3 = new AlertDialog.Builder(filelistform.this);
+                    alert3.setTitle("Are you sure you want to delete?");
+                    // Set an EditText view to get user input
 
 
-                alert3.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
+                    alert3.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
 
-                        // Do something with value!
+                            // Do something with value!
 
-                    }
-                });
-                alert3.setNegativeButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                // Canceled.
-                            }
-                        });
-                alert3.show();
-
+                        }
+                    });
+                    alert3.setNegativeButton("Cancel",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    // Canceled.
+                                }
+                            });
+                    alert3.show();
+                }
+                else {
+                    Toast toast = Toast.makeText(filelistform.this,"Choice File",Toast.LENGTH_SHORT);
+                    toast.show();
+                }
                 break;
 
             case R.id.rename_button:
-                AlertDialog.Builder alert = new AlertDialog.Builder(filelistform.this);
-                alert.setTitle("Input File Name");
-                // Set an EditText view to get user input
-                final EditText input = new EditText(this);
-                alert.setView(input);
+                if(file_id!=null) {
+                    AlertDialog.Builder alert = new AlertDialog.Builder(filelistform.this);
+                    alert.setTitle("Input File Name");
+                    // Set an EditText view to get user input
+                    final EditText input = new EditText(this);
+                    alert.setView(input);
 
-                alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        String value = input.getText().toString();
-                        value.toString();
-                        // Do something with value!
+                    alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            String value = input.getText().toString();
+                            value.toString();
+                            // Do something with value!
 
-                    }
-                });
-                alert.setNegativeButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                // Canceled.
-                            }
-                        });
-                alert.show();
+                        }
+                    });
+                    alert.setNegativeButton("Cancel",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    // Canceled.
+                                }
+                            });
+                    alert.show();
+                }
+                else {
+                    Toast toast = Toast.makeText(filelistform.this,"Choice File",Toast.LENGTH_SHORT);
+                    toast.show();
+                }
                 break;
 
             case R.id.refresh_button:
-                refreshList(1040);
+                refreshList();
 
                 break;
 

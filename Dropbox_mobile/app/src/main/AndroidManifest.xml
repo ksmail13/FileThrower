@@ -2,7 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dropbox.john.dropbox_mobile" >
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
+
     <application
+        android:name=".global"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -32,8 +36,10 @@
             android:label="@string/app_name" >
         </activity>
 
-
-
+        <activity
+            android:name=".inviteform"
+            android:label="@string/app_name" >
+        </activity>
 
     </application>
 

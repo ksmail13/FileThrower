@@ -21,8 +21,9 @@
     <EditText
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:id="@+id/input_name"
+        android:id="@+id/input_email"
         android:layout_centerHorizontal="true"
+        android:inputType="textEmailAddress"
         android:layout_below="@+id/text_name"
         />
 
@@ -56,7 +57,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Name"
+        android:text="Email"
         android:layout_marginTop="60dp"
         android:id="@+id/text_name"
         android:layout_centerHorizontal="true"
@@ -67,7 +68,7 @@
         android:layout_height="wrap_content"
         android:text="ID"
         android:id="@+id/text_id"
-        android:layout_below="@+id/input_name"
+        android:layout_below="@+id/input_email"
         android:layout_centerHorizontal="true"
         android:textSize="20dp" />
 

@@ -14,6 +14,12 @@ public class login {
     public int correct_user()
     {
 
+        org.json.simple.JSONObject obj = new org.json.simple.JSONObject();
+        obj.put("ID",ID);
+        obj.put("PW",Password);
+        String data = obj.toString();
+
+
         return 1;
     }
 

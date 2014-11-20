@@ -13,32 +13,33 @@
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="430dp"
-        android:layout_below="@+id/linearLayout3"
-        android:id="@+id/linearLayout2">
+        android:id="@+id/linearLayout2"
+        android:layout_below="@+id/linearLayout3">
+
 
         <ListView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:listSelector="#FFFFFFFF"
-            android:id="@+id/grouplist" />
+            android:id="@+id/invitelist" />
     </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:id="@+id/linearLayout3"
-        android:layout_centerHorizontal="true"
         >
 
-
-        <Button
+        <TextView
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:text="Refresh"
-            android:textSize="12dp"
-            android:id="@+id/refresh_button" />
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Invite List"
+            android:id="@+id/textView"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -54,45 +55,16 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Make"
+            android:text="Accept"
             android:textSize="15dp"
-            android:id="@+id/make_button" />
+            android:id="@+id/accept_button" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Enter"
+            android:text="Reject"
             android:textSize="15dp"
-            android:id="@+id/enter_button" />
+            android:id="@+id/reject_button" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Delete"
-            android:textSize="15dp"
-            android:id="@+id/delete_button" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Invite"
-            android:textSize="15dp"
-            android:id="@+id/invite_button" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Exit"
-            android:textSize="15dp"
-            android:id="@+id/exit_button" />
     </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Group List"
-        android:id="@+id/textView"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
 </RelativeLayout>

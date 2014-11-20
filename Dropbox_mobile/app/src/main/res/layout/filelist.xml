@@ -4,7 +4,7 @@
     android:orientation="vertical" android:layout_width="fill_parent"
     android:layout_height="fill_parent"
 
-    >
+    android:id="@+id/RelativeLayout">
 
     <TextView
         android:layout_width="wrap_content"
@@ -18,11 +18,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="New Text"
-        android:id="@+id/date_text"
+        android:id="@+id/uploader_text"
         android:layout_below="@+id/name_text"
         android:layout_alignParentEnd="true" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/date_text"
+        android:layout_below="@+id/name_text"
+        android:layout_toStartOf="@+id/uploader_text"
+        android:layout_marginRight="20dp" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/size_text"
+        android:layout_below="@+id/name_text"
+        android:layout_toStartOf="@+id/date_text"
+        android:layout_marginRight="20dp" />
 
 
 </RelativeLayout>
