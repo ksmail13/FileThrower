@@ -1,11 +1,13 @@
 package dropbox.server.Communicate;
 
+import sun.misc.ThreadGroupUtils;
+
 /**
  * Created by micky on 2014. 11. 8..
  * 서버 인스턴스를 생성하고 관리하는 클래스
  */
 public class ServerManager {
-    public static final String DEFAULT_IP = "127.0.0.1";
+    public static final String DEFAULT_IP = "0.0.0.0";
     public static final int DEFAULT_PORT = 8080;
 
     private static ServerManager managerInstance;
@@ -21,13 +23,24 @@ public class ServerManager {
     private RelayServer relayServer;
     private FileServer fileServer;
 
-    private ServerManager() {
+    private Thread relayServerThread;
 
-    }
+    private ServerManager() {}
 
     public void startServer() {
-        relayServer = new RelayServer(DEFAULT_IP, DEFAULT_PORT);
-        relayServer.startServer();
+        relayServerThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                relayServer = new RelayServer(DEFAULT_IP, DEFAULT_PORT);
+                relayServer.startServer();
+            }
+        });
+        relayServerThread.setDaemon(true);
+        relayServerThread.start();
+
+        fileServer = new FileServer();
+
+        fileServer.startServer(DEFAULT_PORT+1);
     }
 
 }

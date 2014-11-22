@@ -3,6 +3,9 @@ package dropbox.server.Communicate;
 import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import dropbox.common.Message;
 import dropbox.common.MessageWrapper;
+import dropbox.server.Account.AccountManager;
+import dropbox.server.FileManage.FileManager;
+import dropbox.server.Group.GroupManager;
 import dropbox.server.Util.ByteConverter;
 import dropbox.server.Util.Logger;
 
@@ -29,6 +32,10 @@ public class RelayServer {
     private ServerSocketChannel serverSockChennel = null;
     private ServerSocket serverSocket = null;
 
+    private GroupManager groupManager = null;
+    private FileManager fileManager = null;
+    private AccountManager accountManager = null;
+
     RelayServer(String ip, int port){
         this(new InetSocketAddress(ip, port));
     }
@@ -36,6 +43,8 @@ public class RelayServer {
     RelayServer(InetSocketAddress serverSocketAddress) {
         initServer(serverSocketAddress);
     }
+
+
 
     /**
      * 서버 내부 인스턴스를 초기화한다.
@@ -66,7 +75,7 @@ public class RelayServer {
 
         try {
             while(true) {
-//                Logger.logging("selecting!");
+                Logger.logging("selecting!");
                 selector.select();
                 Iterator<SelectionKey> kit = selector.selectedKeys().iterator();
                 while (kit.hasNext()) {
@@ -98,7 +107,7 @@ public class RelayServer {
         try {
             SocketChannel sc = serverChannel.accept();
             registerChannel(sc, SelectionKey.OP_READ);
-            Logger.logging("Connect form "+sc.getLocalAddress());
+            Logger.logging("Connect form "+sc.getRemoteAddress());
         }
         catch(ClosedChannelException cce) {
             Logger.errorLogging("Selector was closed", cce);
@@ -108,6 +117,17 @@ public class RelayServer {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 소켓연결을 끊는다.
+     * @param socketChannel
+     * @throws IOException
+     */
+    private void disconnect(SocketChannel socketChannel) throws IOException {
+        Logger.logging("user "+socketChannel.getRemoteAddress()+" is disconnect");
+
+        socketChannel.close();
     }
 
     /**
@@ -187,15 +207,13 @@ public class RelayServer {
 
             switch (msg.messageType) {
                 // file request
-                case FileUpload: case FileSync:
+                case File:
                     break;
                 // account request
-                case CreateAccount: case ChangePassword:
+                case Account:
                     break;
                 // group request
-                case CreateGroup: case AddMember: case ExitGroup:
-                case ChangePermission: case DeleteGroup:
-
+                case Group:
                     break;
             }
 
@@ -206,13 +224,6 @@ public class RelayServer {
         }
     }
 
-    /**
-     * 소켓연결을 끊는다.
-     * @param socketChannel
-     * @throws IOException
-     */
-    private void disconnect(SocketChannel socketChannel) throws IOException {
-        Logger.logging("user "+socketChannel.getLocalAddress()+" is disconnect");
-        socketChannel.close();
-    }
+
+
 }

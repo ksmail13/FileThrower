@@ -1,0 +1,33 @@
+
+CREATE TABLE InfoBase (
+                infoId CHAR NOT NULL primary key,
+                name VARCHAR NOT NULL,
+);
+
+
+CREATE TABLE AccountInfo (
+                accountId CHAR(10) NOT NULL primary key references infobase(infoid) ON DELETE CASCADE ON UPDATE CASCADE,
+                id VARCHAR NOT NULL,
+                password VARCHAR NOT NULL,
+                email VARCHAR NOT NULL
+);
+
+
+CREATE TABLE GroupInfo (
+                groupId CHAR(10) NOT NULL primary key references infobase(infoid) ON DELETE CASCADE ON UPDATE CASCADE,
+                groupMemberList ARRAY NOT NULL
+);
+
+
+CREATE TABLE GroupMemberInfo (
+                groupId CHAR(10) NOT NULL references infobase(infoid) ON DELETE CASCADE ON UPDATE CASCADE,
+                accountId CHAR(10) NOT NULL references infobase(infoid) ON DELETE CASCADE ON UPDATE CASCADE,
+                permission CHAR NOT NULL
+);
+
+
+CREATE TABLE FileInfo (
+                fileId CHAR(10) NOT NULL primary key references infobase(infoid) ON DELETE CASCADE ON UPDATE CASCADE,
+                filsSize INTEGER NOT NULL,
+                groupId CHAR(10) NOT NULL references infobase(infoid) ON DELETE CASCADE ON UPDATE CASCADE
+);
