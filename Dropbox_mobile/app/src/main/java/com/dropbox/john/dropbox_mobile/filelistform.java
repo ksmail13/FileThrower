@@ -1,20 +1,33 @@
-package com.dropbox.john.dropbox_mobile;
+package com.dropbox.john.Dropbox_Mobile;
 
 import android.app.*;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.content.Intent;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.*;
 
 import android.provider.MediaStore;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
+
 import android.database.Cursor;
 
 import android.widget.*;
+
+import com.dropbox.john.Dropbox_Mobile.Artifacts.MyFtpClient;
+import com.dropbox.john.Dropbox_Mobile.Artifacts.file_management;
+
+import org.apache.commons.net.ftp.FTPFile;
 
 
 public class filelistform extends Activity implements OnClickListener {
@@ -23,6 +36,8 @@ public class filelistform extends Activity implements OnClickListener {
     ListView filelist;
     String file_id=null;
     String group_id="";
+
+    String user_id;
     file_management fm = new file_management();
     Button download_button, upload_button, rename_button, delete_button,refresh_button;
     @Override
@@ -50,15 +65,36 @@ public class filelistform extends Activity implements OnClickListener {
 
         Intent intent = getIntent();
         group_id = intent.getStringExtra("group_id");
-        System.out.println(group_id);
+        user_id = intent.getStringExtra("user_id");
 
-        refreshList();
+
+        try {
+            refreshList();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
-    public void refreshList() {
+    public void refreshList() throws InterruptedException {
 
-        ArrayList<HashMap<String,String>> list =new ArrayList<HashMap<String, String>>();
+
+        MyFtpClient ftp = new MyFtpClient();
+        ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
         filelist = (ListView) findViewById(R.id.filelist);
 
+
+        String[] from = new String[]{"name", "size"};
+        int[] to = new int[]{R.id.name_text, R.id.size_text};
+
+
+        list = fm.load_list(group_id);
+
+
+        SimpleAdapter notes = new SimpleAdapter(filelistform.this, list, R.layout.filelist, from, to);
+        filelist.setAdapter(notes);
+        filelist.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
+
+        /*
         String[] from = new String[] {"name","size","date","uploader"};
         int[] to = new int[]{R.id.name_text,R.id.size_text,R.id.date_text,R.id.uploader_text};
 
@@ -71,8 +107,14 @@ public class filelistform extends Activity implements OnClickListener {
         SimpleAdapter notes = new SimpleAdapter(this,list, R.layout.filelist, from,to);
         filelist.setAdapter(notes);
         filelist.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        */
 
-        filelist.setOnItemClickListener( new ListViewItemClickListener() );
+
+        filelist.setOnItemClickListener(new ListViewItemClickListener());
+        filelist.setOnItemLongClickListener(new ListViewItemLongClickListener());
+
+        file_id = null;
+
 
     }
 
@@ -88,17 +130,19 @@ public class filelistform extends Activity implements OnClickListener {
     }
 
     public void onBackPressed() {
+
         finish();
     }
 
-    private String getPath(Uri uri)
-    {
+    private String getPath(Uri uri) throws UnsupportedEncodingException {
         String res = null;
+
         String[] projection = { MediaStore.Images.Media.DATA };
         Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
         if(cursor.moveToFirst()){
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             res = cursor.getString(column_index);
+            System.out.println("--------"+res);
         }
         cursor.close();
         return res;
@@ -110,8 +154,24 @@ public class filelistform extends Activity implements OnClickListener {
         if (resultCode == RESULT_OK) {
             if (requestCode == 1) {
                 Uri uri = intent.getData();
-                String path = getPath(uri);
-                System.out.println(path);
+                String path = null;
+                try {
+                    path = getPath(uri);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(path + "==== " + uri);
+                try {
+
+                    fm.upload(user_id,group_id,path);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    refreshList();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
 
         }
@@ -123,7 +183,7 @@ public class filelistform extends Activity implements OnClickListener {
         switch (getId) {
             case R.id.download_button:
                 if(file_id!=null) {
-
+                    fm.download(group_id,file_id);
 
                 }
                 else {
@@ -140,6 +200,7 @@ public class filelistform extends Activity implements OnClickListener {
                 startActivityForResult(i, 1);
 
 
+
                 break;
             case R.id.delete_button:
 
@@ -153,7 +214,17 @@ public class filelistform extends Activity implements OnClickListener {
                     alert3.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
 
+                            try {
+                                fm.delete(group_id,file_id);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                             // Do something with value!
+                            try {
+                                refreshList();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
 
                         }
                     });
@@ -177,14 +248,20 @@ public class filelistform extends Activity implements OnClickListener {
                     alert.setTitle("Input File Name");
                     // Set an EditText view to get user input
                     final EditText input = new EditText(this);
+                    input.setFilters(new InputFilter[] {filterAlphaNum});
                     alert.setView(input);
 
                     alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             String value = input.getText().toString();
-                            value.toString();
+                            fm.rename(value,group_id,file_id);
                             // Do something with value!
 
+                            try {
+                                refreshList();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
                     alert.setNegativeButton("Cancel",
@@ -202,7 +279,11 @@ public class filelistform extends Activity implements OnClickListener {
                 break;
 
             case R.id.refresh_button:
-                refreshList();
+                try {
+                    refreshList();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
                 break;
 
@@ -217,6 +298,23 @@ public class filelistform extends Activity implements OnClickListener {
     }
 
 
+    protected InputFilter filterAlphaNum = new InputFilter() {
+        public CharSequence filter(CharSequence source, int start, int end,
+                                   Spanned dest, int dstart, int dend) {
 
+            Pattern ps = Pattern.compile("^[a-zA-Z0-9]+$");
+            if (!ps.matcher(source).matches()) {
+                return "";
+            }
+            return null;
+        }
+    };
+    private class ListViewItemLongClickListener implements AdapterView.OnItemLongClickListener {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
+            file_id = ((TextView) view.findViewById(R.id.name_text)).getText().toString();
+            return false;
+        }
+    }
 }

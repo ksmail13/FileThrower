@@ -1,24 +1,29 @@
-package com.dropbox.john.dropbox_mobile;
+package com.dropbox.john.Dropbox_Mobile;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -28,6 +33,7 @@ public class inviteform extends Activity implements OnClickListener {
 
     ListView invitelist;
     String group_id=null;
+    String list_data;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -43,10 +49,10 @@ public class inviteform extends Activity implements OnClickListener {
         reject_button.setOnClickListener(this);
 
 
-        refreshList(100);
-}
+        refreshList();
+    }
 
-    public void refreshList(int i) {
+    public void refreshList() {
 
         ArrayList<HashMap<String,String>> list =new ArrayList<HashMap<String, String>>();
         invitelist = (ListView) findViewById(R.id.invitelist);
@@ -64,6 +70,8 @@ public class inviteform extends Activity implements OnClickListener {
 
 
         invitelist.setOnItemClickListener( new ListViewItemClickListener() );
+        invitelist.setOnItemLongClickListener(new ListViewItemLongClickListener());
+        group_id=null;
     }
 
     private class ListViewItemClickListener implements AdapterView.OnItemClickListener
@@ -75,10 +83,17 @@ public class inviteform extends Activity implements OnClickListener {
 
         }
     }
+    private class ListViewItemLongClickListener implements AdapterView.OnItemLongClickListener {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+            group_id = ((TextView) view.findViewById(R.id.group_id)).getText().toString();
+            return false;
+        }
+    }
 
     public void onBackPressed() {
-        Intent intent2 = new Intent(this, groupform.class);
-        startActivity(intent2);
+
         finish();
     }
 
@@ -90,19 +105,36 @@ public class inviteform extends Activity implements OnClickListener {
             case R.id.accept_button:
 
                 if(group_id!=null) {
+                    org.json.simple.JSONObject obj = new org.json.simple.JSONObject();
 
-                    Intent intent = new Intent(this, filelistform.class);
-                    startActivity(intent);
+                    obj.put("Group_ID",group_id);
+
+                    String data = obj.toString();
+
+                    refreshList();
 
                 }
                 else {
-                    Toast toast = Toast.makeText(inviteform.this,"Choice Message",Toast.LENGTH_SHORT);
+                    Toast toast = Toast.makeText(inviteform.this,"Choice Invite Message",Toast.LENGTH_SHORT);
                     toast.show();
                 }
                 break;
             case R.id.reject_button:
+                if(group_id!=null) {
+                    org.json.simple.JSONObject obj = new org.json.simple.JSONObject();
+
+                    obj.put("Group_ID",group_id);
+                    String data = obj.toString();
 
 
+                    refreshList();
+
+
+                }
+                else {
+                    Toast toast = Toast.makeText(inviteform.this,"Choice Invite Message",Toast.LENGTH_SHORT);
+                    toast.show();
+                }
 
                 break;
 
@@ -122,18 +154,25 @@ public class inviteform extends Activity implements OnClickListener {
         ArrayList<HashMap<String,String>> list =new ArrayList<HashMap<String, String>>();
 
 
-        // 서버로 부터 그룹 목록을 받음
 
-        String data = "[{\"Group_ID\":\"a\",\"Inviter\":\"1\"},{\"Group_ID\":\"b\",\"Inviter\":\"2\"},{\"Group_ID\":\"c\",\"Inviter\":\"3\"}]";
+        org.json.simple.JSONObject obj = new org.json.simple.JSONObject();
+        obj.put("Event","invitelist");
+        String data = obj.toString();
+
+
+
+        // 서버로 부터 초대받은 그룹의 목록을 받음
+        list_data = "[{\"Group_ID\":\"a\",\"Inviter\":\"1\"},{\"Group_ID\":\"b\",\"Inviter\":\"2\"},{\"Group_ID\":\"c\",\"Inviter\":\"3\"}]";
+
         try{
 
-            JSONArray ja = new JSONArray(data);
+            JSONArray ja = new JSONArray(list_data);
             for (int i = 0; i < ja.length(); i++){
                 JSONObject order = ja.getJSONObject(i);
                 HashMap<String, String> item =   new HashMap<String, String>();
                 item.put("Group_ID",order.getString("Group_ID"));
                 item.put("Inviter",order.getString("Inviter"));
-                System.out.println(item);
+
                 list.add(item);
             }
         }

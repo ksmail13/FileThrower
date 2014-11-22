@@ -1,4 +1,4 @@
-package com.dropbox.john.dropbox_mobile;
+package com.dropbox.john.Dropbox_Mobile.Artifacts;
 
 /**
  * Created by John on 2014-11-12.
@@ -14,14 +14,10 @@ import android.os.AsyncTask;
 
 public class NetworkTask extends AsyncTask<Void, Void, Void> {
 
-    String dstAddress;
-    int dstPort;
+    String dstAddress="192.168.0.2";
+    int dstPort=8080;
     String response;
 
-    NetworkTask(String addr, int port) {
-        dstAddress = addr;
-        dstPort = port;
-    }
 
     @Override
     protected Void doInBackground(Void... arg0) {

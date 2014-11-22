@@ -1,4 +1,4 @@
-package com.dropbox.john.dropbox_mobile;
+package com.dropbox.john.Dropbox_Mobile;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

@@ -1,4 +1,4 @@
-package com.dropbox.john.dropbox_mobile;
+package com.dropbox.john.Dropbox_Mobile;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -8,7 +8,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.*;
 import android.widget.EditText;
+import com.dropbox.john.Dropbox_Mobile.Artifacts.join;
 
+
+import java.io.IOException;
 import java.util.regex.Pattern;
 
 
@@ -49,7 +52,12 @@ public class joinform extends Activity implements OnClickListener {
         // TODO Auto-generated method stub
 
         join user = new join(input_email.getText().toString(), input_id.getText().toString(), input_pw.getText().toString(), input_confirm.getText().toString());
-        int correct_info = user.correct_info();
+        int correct_info = 0;
+        try {
+            correct_info = user.correct_info();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (correct_info == 3) {
 
             finish();
