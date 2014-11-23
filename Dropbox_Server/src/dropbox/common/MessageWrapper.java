@@ -33,12 +33,9 @@ public class MessageWrapper{
     }
 
     public static Message byteArrayToMessage(byte[] buf) throws IOException, ClassNotFoundException {
-        Message msg = null;
-
-        ByteInputStream bis = new ByteInputStream(buf, 4, buf.length-4);
+        ByteArrayInputStream bis = new ByteArrayInputStream(buf, 4, buf.length-4);
         ObjectInputStream ois = new ObjectInputStream(bis);
-
-        msg = (Message)ois.readObject();
+        Message msg = (Message)ois.readObject();
 
         return msg;
     }

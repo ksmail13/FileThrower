@@ -27,12 +27,12 @@ public abstract class InfoBase implements Queriable, Serializable {
 
 
     public String getInsertQueryString(){
-        return String.format("Insert into InfoBase(infoId, name) values (%s, %s);", id, name);
+        return String.format("Insert into InfoBase(infoId, name) values ('%s', '%s');", id, name);
     }
 
     protected static String keyGenerate(String keyId){
         int num = (int)Math.round(Math.random()*100000000);
-        return String.format("%s%10d", keyId, num);
+        return String.format("%s%09d", keyId, num);
     }
 
     @Override

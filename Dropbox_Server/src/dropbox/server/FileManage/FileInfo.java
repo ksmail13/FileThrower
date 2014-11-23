@@ -32,7 +32,7 @@ public class FileInfo extends InfoBase {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
         return super.getInsertQueryString() +
-                String.format("Insert into FileInfo(infoId, fileSize, groupId, updateTime) values (%s, %s, %s, %s);",
+                String.format("Insert into FileInfo(infoId, fileSize, groupInfo, updateTime) values ('%s', '%s', '%s', '%s');",
                         id, fileSize, groupId, df.format(Calendar.getInstance().getTime()));
     }
 

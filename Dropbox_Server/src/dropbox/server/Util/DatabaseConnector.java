@@ -1,6 +1,7 @@
 package dropbox.server.Util;
 
 import dropbox.server.Account.AccountInfo;
+import dropbox.server.Base.Queriable;
 
 import java.sql.*;
 import java.util.Map;
@@ -50,9 +51,10 @@ public class DatabaseConnector {
 
     public boolean modify(String query) {
         boolean result = false;
+        Logger.logging("modify query:" +query);
         try {
             PreparedStatement pst = conn.prepareStatement(query);
-            pst.executeQuery();
+            pst.execute();
             result = true;
         } catch (SQLException e) {
             Logger.errorLogging(e);
@@ -61,7 +63,7 @@ public class DatabaseConnector {
         return result;
     }
 
-    public static void main(String[] args) {
-
+    public boolean insert(Queriable infoObject) {
+        return modify(infoObject.getInsertQueryString());
     }
 }

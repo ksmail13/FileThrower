@@ -15,21 +15,21 @@ import java.util.Map;
  * Created by micky on 2014. 11. 22..
  */
 public class Test {
-    /*public static void main(String[] args) {
+    public static void main(String[] args) {
 
-        DatabaseConnector connector = DatabaseConnector.getConnector();
+//        DatabaseConnector connector = DatabaseConnector.getConnector();
+//
+//        try {
+//            connector.select("select * from infobase as i left join accountinfo as a on i.infoid = a.accountid");
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
 
-        try {
-            connector.select("select * from infobase as i left join accountinfo as a on i.infoid = a.accountid");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
 
 
-
-        byte[] len = ByteConverter.intToByteArray(256);
-        System.out.println(len);
-    }*/
+        byte[] len = ByteConverter.intToByteArray(242);
+        System.out.println(ByteConverter.byteArrayToInt(len[3],len[2], len[1], len[0]));
+    }
 
     /**
      * MapDB uses custom serialization which stores class metadata at single place.
@@ -45,7 +45,7 @@ public class Test {
      *
      *   3) Even your values should implement equalsTo method for CAS (compare-and-swap) operations.
      *
-     */
+
     public static class Person implements Serializable{
         final String name;
         final String city;
@@ -141,4 +141,5 @@ public class Test {
 
 
     }
+        */
 }

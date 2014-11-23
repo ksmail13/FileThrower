@@ -17,19 +17,23 @@ public class GroupInfo extends InfoBase {
     }
 
     public static String keyGenerate() {
-        return null;
+        return InfoBase.keyGenerate("G");
+    }
+
+    public void addGroupMember(GroupPeopleInfo newMember) {
+        groupPeopleList.add(newMember);
     }
 
     @Override
     public String getInsertQueryString() {
-        StringBuilder sb = new StringBuilder();
-        for(GroupPeopleInfo info : groupPeopleList) {
-            sb.append("\""+info.getGroupId()+"\"");
-            sb.append(",");
-        }
-        sb.deleteCharAt(sb.length()-1);
+//        StringBuilder sb = new StringBuilder();
+//        for(GroupPeopleInfo info : groupPeopleList) {
+//            sb.append("\""+info.getGroupInfo()+"\"");
+//            sb.append(",");
+//        }
+//        sb.deleteCharAt(sb.length()-1);
         return super.getInsertQueryString() +
-                String.format("Insert into GroupInfo(groupId, groupMemberList) values (%s,'{%s}')", id, sb.toString());
+                String.format("Insert into groupinfo(groupId, comment) values ('%s','%s')", id, comment);
     }
 
     @Override

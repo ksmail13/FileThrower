@@ -19,7 +19,7 @@ public class Logger {
     }
 
     public static void errorLogging(Throwable t) {
-        logging(null, System.err, t);
+        errorLogging(null, t);
     }
 
     public static void logging(String message, PrintStream target) {
@@ -27,7 +27,7 @@ public class Logger {
     }
 
     public static void logging(String message, Throwable e) {
-        logging(message, e);
+        logging(message, System.out, e);
     }
 
     public static void logging(String message, PrintStream target,  Throwable t) {
@@ -35,11 +35,13 @@ public class Logger {
         target.printf("[%s] %s",df.format(Calendar.getInstance().getTime()),  message == null?"":message);
         if(t != null) {
             target.print(t.getLocalizedMessage());
+            //target.print(t.getStackTrace()[0].toString());
+            t.printStackTrace();
         }
         target.println();
     }
 
-    public static void debuglogging(String message) {
+    public static void debugLogging(String message) {
         logging(message);
     }
 

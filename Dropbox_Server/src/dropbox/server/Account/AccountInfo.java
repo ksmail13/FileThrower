@@ -30,9 +30,8 @@ public class AccountInfo extends InfoBase {
         try {
             if(dbresult.next()) {
                 newAccount = new AccountInfo(dbresult.getString("infoid"),
-                        dbresult.getString("name"),
                         dbresult.getString("id"),
-                        dbresult.getString("email"), null);
+                        dbresult.getString("email"), "");
 
             }
         } catch (SQLException e) {
@@ -42,8 +41,8 @@ public class AccountInfo extends InfoBase {
         return newAccount;
     }
 
-    public AccountInfo(String id, String name, String u_id, String email, String password) {
-        super(id, name);
+    public AccountInfo(String id, String u_id, String email, String password) {
+        super(id, "");
         this.u_id = u_id;
         this.email = email;
         this.password = password;
@@ -67,8 +66,7 @@ public class AccountInfo extends InfoBase {
 
     @Override
     public String getInsertQueryString() {
-
-        return super.getInsertQueryString() + String.format("Insert into AccountInfo(accountId, id, email, password) values (%s, %s, %s, %s)",
+        return super.getInsertQueryString() + String.format("Insert into AccountInfo(accountInfo, id, email, password) values ('%s', '%s', '%s', '%s')",
                 id, u_id, email, password);
     }
 

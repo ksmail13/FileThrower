@@ -1,24 +1,17 @@
 package dropbox.server.Account;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import dropbox.common.Message;
-import dropbox.common.MessageType;
-import dropbox.common.MessageWrapper;
 import dropbox.server.Base.ManagerBase;
 import dropbox.server.Util.DatabaseConnector;
 import dropbox.server.Util.Logger;
+import dropbox.server.Util.SocketChannelWrapper;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.mapdb.Atomic;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
-import sun.rmi.runtime.Log;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
+import javax.xml.crypto.Data;
+import java.net.Socket;
 import java.nio.channels.SocketChannel;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
@@ -28,7 +21,6 @@ import java.util.Map;
  */
 public class AccountManager extends ManagerBase {
     public final static String DBNAME = "AccountManager";
-    public final static String SESSION = "session";
     private static AccountManager managerInstance = null;
 
     public static AccountManager getManager() {
@@ -38,53 +30,29 @@ public class AccountManager extends ManagerBase {
         return managerInstance;
     }
 
-    private Map<SocketChannel, AccountInfo> session;
-
+    private SessionManager session;
+    private AccountCache cache;
 
     private AccountManager() {
-        DB db = DBMaker.newMemoryDB().transactionDisable().closeOnJvmShutdown().make();
-        session = db.getTreeMap(SESSION);
+        session = new SessionManager();
+        cache = new AccountCache();
     }
 
-
     @Override
-    public void receiveMessage(SocketChannel sc, Message msg) throws IOException {
-        JSONParser parser = new JSONParser();
-        JSONObject resultJson = null;
-        Message message = null;
-        Boolean procedureResult = false;
-        try {
-            Object parseResult = parser.parse(msg.msg);
-            if(parseResult instanceof JSONObject) {
-                JSONObject parsedObject = (JSONObject)parseResult;
-                String subCategory = (String)parsedObject.get(Message.SUBCATEGORY_KEY);
-                resultJson = new JSONObject();
+    public JSONObject messageHandling(SocketChannel sc, JSONObject parsedObject) {
+        JSONObject resultJson = new JSONObject();
+        String subCategory = (String)parsedObject.get(Message.SUBCATEGORY_KEY);
 
-                if("login".equals(subCategory)) {
+        if("login".equals(subCategory)) {
+            resultJson.put("result", login(sc, (String) parsedObject.get("id"), (String) parsedObject.get("password")));
+        } else if("create".equals(subCategory)) {
+            resultJson.put("result", createAccount(sc, (String) parsedObject.get("id"), (String) parsedObject.get("password"), (String) parsedObject.get("email")));
+        } else if("logout".equals(subCategory)) { }
 
-                    procedureResult = login(sc, (String) parsedObject.get("id"), (String) parsedObject.get("password"));
-                }
-                else if("logout".equals(subCategory)){}
-                else if("create".equals(subCategory)) {
-                    procedureResult = createAccount(sc, (String) parsedObject.get("id"), (String) parsedObject.get("password"),(String) parsedObject.get("email"));
-                }
+        resultJson.put("uid", parsedObject.get("id"));
 
-            }
-        } catch (ParseException e) {
-            Logger.errorLogging(e);
-        } catch (ClassCastException cce) {
-            Logger.errorLogging(cce);
-        } finally {
-            resultJson.put("result",procedureResult);
-        }
-
-        if(resultJson != null) {
-            message = new Message();
-            message.messageType = MessageType.Result;
-            message.msg = resultJson.toJSONString();
-
-            sc.write(ByteBuffer.wrap(MessageWrapper.messageToByteArray(message)));
-        }
+        resultJson.put(Message.SUBCATEGORY_KEY, subCategory);
+        return resultJson;
     }
 
 
@@ -95,9 +63,12 @@ public class AccountManager extends ManagerBase {
                 "on a.accountid = i.infoid where a.id='%s' and a.password='%s';", id, password);
         try {
             ResultSet result = dbConn.select(loginQuery);
-            AccountInfo newAccount = AccountInfo.createAccount(result);
-            if(newAccount != null) {
-                session.put(sc, newAccount);
+            AccountInfo loginAccount = AccountInfo.createAccount(result);
+            if(loginAccount != null) {
+                SocketChannelWrapper scw = new SocketChannelWrapper(sc);
+                session.put(scw, loginAccount);
+                cache.put(loginAccount.getId(), loginAccount);
+
                 return true;
             }
 
@@ -114,11 +85,12 @@ public class AccountManager extends ManagerBase {
 
         DatabaseConnector dbConn = DatabaseConnector.getConnector();
         String newKey = AccountInfo.keyGenerate();
-        String createQuery = String.format("insert into infobase values(%s);" +
-                "insert into accoutinfo values(%s, %s, %s, %s", newKey, newKey, id, password, email);
-        if(dbConn.modify(createQuery)) {
-            AccountInfo newAccount = new AccountInfo(newKey,"", id, email, "");
-            session.put(sc, newAccount);
+        AccountInfo newAccount = new AccountInfo(newKey, id, email, password);
+
+        if(dbConn.insert(newAccount)) {
+            SocketChannelWrapper scw = new SocketChannelWrapper(sc);
+            session.put(scw, newAccount);
+            cache.put(newAccount.getId(), newAccount);
             res = true;
         }
 
@@ -131,8 +103,96 @@ public class AccountManager extends ManagerBase {
      * @return 연결된 계정
      */
     public AccountInfo getLoginInfo(SocketChannel sc) {
-        return session.get(sc);
+        SocketChannelWrapper scw = new SocketChannelWrapper(sc);
+        return session.get(scw);
     }
 
+    public void deleteSession(SocketChannel sc) {
+        session.remove(sc);
+    }
 
+    public AccountInfo getUserInfo(String inviteId) {
+        return cache.get(inviteId);
+    }
+
+    /**
+     * 계정과 현재 연결된 소켓을 관리하는 클래스
+     */
+    class SessionManager {
+        public final static String SESSION = "session";
+
+        Map<SocketChannelWrapper, AccountInfo> session;
+
+        SessionManager() {
+            sessionInit();
+        }
+
+        private void sessionInit() {
+            DB db = DBMaker.newMemoryDB().transactionDisable().closeOnJvmShutdown().make();
+            session = db.getTreeMap(SESSION);
+
+        }
+
+        public AccountInfo get(SocketChannelWrapper scw) {
+            return session.get(scw);
+        }
+
+        public AccountInfo get(SocketChannel sc) {
+            SocketChannelWrapper scw = new SocketChannelWrapper(sc);
+            scw.setSocketChannel(sc);
+
+            return get(scw);
+        }
+
+        public void put(SocketChannelWrapper scw, AccountInfo newAccount) {
+            session.put(scw, newAccount);
+        }
+
+        public void put(SocketChannel sc, AccountInfo newAccount) {
+            session.put(new SocketChannelWrapper(sc), newAccount);
+        }
+
+        public void remove(SocketChannel sc) {
+            session.remove(new SocketChannelWrapper(sc));
+        }
+    }
+
+    class AccountCache {
+        Map<String, AccountInfo> cache;
+
+        AccountCache() {
+            initCache();
+        }
+
+        private void initCache() {
+            cache = DBMaker.newMemoryDB().transactionDisable().closeOnJvmShutdown().make().getTreeMap(DBNAME);
+        }
+
+        public AccountInfo get(String accountId) {
+            AccountInfo accountInfo = cache.get(accountId);
+            if(accountInfo == null) {
+                try {
+                    ResultSet rs = DatabaseConnector.getConnector().select(String.format("select i.infoid, a.id, i.name, a.email \n" +
+                            "from infobase as i right join accountinfo as a \n" +
+                            "on a.accountid = i.infoid where a.id='%s';", accountId));
+                    while(rs.next()) {
+                        accountInfo = new AccountInfo(rs.getString("infoid")
+                        , rs.getString("id")
+                        , rs.getString("name")
+                        , rs.getString("email"));
+
+                        cache.put(accountInfo.getId(), accountInfo);
+                    }
+                } catch (SQLException e) {
+                    Logger.errorLogging(e);
+                }
+            }
+
+            return accountInfo;
+        }
+
+        public void put(String id, AccountInfo newAccount) {
+            cache.put(id, newAccount);
+        }
+    }
 }

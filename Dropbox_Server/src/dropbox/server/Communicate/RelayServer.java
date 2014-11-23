@@ -125,10 +125,15 @@ public class RelayServer {
      * @param socketChannel
      * @throws IOException
      */
-    private void disconnect(SocketChannel socketChannel) throws IOException {
-        Logger.logging("user "+socketChannel.getRemoteAddress()+" is disconnect");
+    private void disconnect(SocketChannel socketChannel) {
+        try {
+            Logger.logging("user "+socketChannel.getRemoteAddress()+" is disconnect");
+            AccountManager.getManager().deleteSession(socketChannel);
+            socketChannel.close();
 
-        socketChannel.close();
+        } catch (IOException e) {
+            Logger.errorLogging(e);
+        }
     }
 
     /**
@@ -185,7 +190,7 @@ public class RelayServer {
                     firstread = false;
                 }
 
-                Logger.debuglogging("receive read"+read+"  readbytes = " + readbytes + " messagesize "+messageSize);
+                Logger.debugLogging("receive read" + read + "  readbytes = " + readbytes + " messagesize " + messageSize);
             }
 
             // 수신한 데이터를 파싱한다.
@@ -194,18 +199,16 @@ public class RelayServer {
 
         } catch(IOException ioe) {
             Logger.errorLogging(ioe);
+            if(ioe.getMessage().contains("Connection reset by peer")) {
+                disconnect(sc);
+            }
         }
     }
 
     //private void parse(InputStream inputStream) {
     private void parse(SocketChannel sc, ByteBuffer buffer) {
         try {
-
-            int offset = buffer.arrayOffset();
-            byte[] buf = buffer.array();
-
-            ObjectInputStream ois = new ObjectInputStream(new ByteInputStream(buf,4, buf.length));
-            Message msg = (Message)ois.readObject();
+            Message msg = MessageWrapper.byteArrayToMessage(buffer.array());
 
             Logger.logging(msg.messageType+"");
             Logger.logging(msg.msg);
@@ -220,6 +223,7 @@ public class RelayServer {
                     break;
                 // group request
                 case Group:
+                    GroupManager.getManager().receiveMessage(sc, msg);
                     break;
             }
 

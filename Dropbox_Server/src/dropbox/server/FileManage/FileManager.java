@@ -2,6 +2,7 @@ package dropbox.server.FileManage;
 
 import dropbox.common.Message;
 import dropbox.server.Base.ManagerBase;
+import org.json.simple.JSONObject;
 
 import java.nio.channels.SocketChannel;
 
@@ -15,8 +16,8 @@ public class FileManager extends ManagerBase {
 
 
     @Override
-    public void receiveMessage(SocketChannel sc, Message msg) {
-
+    public JSONObject messageHandling(SocketChannel sc, JSONObject parsedObject) {
+        return null;
     }
 
     private FileManager() {
