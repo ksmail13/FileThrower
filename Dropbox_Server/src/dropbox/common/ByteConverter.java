@@ -1,4 +1,4 @@
-package dropbox.server.Util;
+package dropbox.common;
 
 /**
  * Created by micky on 2014. 11. 21..

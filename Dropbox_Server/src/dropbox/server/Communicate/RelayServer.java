@@ -6,7 +6,7 @@ import dropbox.common.MessageWrapper;
 import dropbox.server.Account.AccountManager;
 import dropbox.server.FileManage.FileManager;
 import dropbox.server.Group.GroupManager;
-import dropbox.server.Util.ByteConverter;
+import dropbox.common.ByteConverter;
 import dropbox.server.Util.Logger;
 
 import java.io.IOException;
