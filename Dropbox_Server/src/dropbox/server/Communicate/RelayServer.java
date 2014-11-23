@@ -184,7 +184,7 @@ public class RelayServer {
             }
 
             // 수신한 데이터를 파싱한다.
-            parse(buffer);
+            parse(sc, buffer);
             buffer.clear();
 
         } catch(IOException ioe) {
@@ -193,7 +193,7 @@ public class RelayServer {
     }
 
     //private void parse(InputStream inputStream) {
-    private void parse(ByteBuffer buffer) {
+    private void parse(SocketChannel sc, ByteBuffer buffer) {
         try {
 
             int offset = buffer.arrayOffset();
@@ -211,6 +211,7 @@ public class RelayServer {
                     break;
                 // account request
                 case Account:
+                    AccountManager.getManager().receiveMessage(sc, msg);
                     break;
                 // group request
                 case Group:

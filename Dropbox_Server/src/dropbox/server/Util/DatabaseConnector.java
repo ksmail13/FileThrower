@@ -46,17 +46,10 @@ public class DatabaseConnector {
         return null;
     }
 
-    public void selectTest(String selectquery) throws SQLException {
+    public ResultSet select(String selectquery) throws SQLException {
         Statement st = conn.createStatement();
         ResultSet rs = st.executeQuery(selectquery);
-        while (rs.next())
-        {
-            System.out.print("Column 1 returned ");
-
-            System.out.println(rs.getString(1));
-        }
-        rs.close();
-        st.close();
+        return rs;
     }
 
     public static void main(String[] args) {

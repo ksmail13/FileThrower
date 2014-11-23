@@ -22,7 +22,8 @@ CREATE TABLE GroupInfo (
 CREATE TABLE GroupMemberInfo (
                 groupId CHAR(10) NOT NULL references infobase(infoid) ON DELETE CASCADE ON UPDATE CASCADE,
                 accountId CHAR(10) NOT NULL references infobase(infoid) ON DELETE CASCADE ON UPDATE CASCADE,
-                permission CHAR NOT NULL
+                permission CHAR NOT NULL,
+		accept char NOT NULL ’N’
 );
 
 
