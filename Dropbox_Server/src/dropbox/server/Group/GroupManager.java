@@ -3,6 +3,8 @@ package dropbox.server.Group;
 import dropbox.common.Message;
 import dropbox.server.Base.ManagerBase;
 
+import java.nio.channels.SocketChannel;
+
 /**
  * Created by micky on 2014. 11. 22..
  */
@@ -19,7 +21,7 @@ public class GroupManager extends ManagerBase {
 
 
     @Override
-    public void receiveMessage(Message msg) {
+    public void receiveMessage(SocketChannel sc, Message msg) {
 
     }
 }

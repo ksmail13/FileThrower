@@ -2,6 +2,7 @@ package dropbox.server.Base;
 
 import dropbox.common.Message;
 
+import java.io.IOException;
 import java.nio.channels.SocketChannel;
 
 /**
@@ -13,7 +14,7 @@ public abstract class ManagerBase {
         return null;
     }
 
-    public abstract void receiveMessage(SocketChannel sc, Message msg);
+    public abstract void receiveMessage(SocketChannel sc, Message msg) throws IOException;
 
     protected ManagerBase() { }
 }

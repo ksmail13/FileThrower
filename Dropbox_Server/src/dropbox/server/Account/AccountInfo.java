@@ -9,25 +9,59 @@ import java.sql.SQLException;
  * Created by micky on 2014. 11. 21..
  */
 public class AccountInfo extends InfoBase {
-    protected String u_id;
-    protected String email;
-    protected String password;
+    protected final String u_id;
+    protected final String email;
+    protected final String password;
+
+    public String getU_id() {
+        return u_id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
 
     public static AccountInfo createAccount(ResultSet dbresult) {
         AccountInfo newAccount = null;
         try {
-            if(dbresult.first()) {
-                newAccount = new AccountInfo();
-                newAccount.id = dbresult.getString("accountid");
-                newAccount.u_id = dbresult.getString("id");
-                newAccount.name = dbresult.getString("name");
-                newAccount.email = dbresult.getString("email");
+            if(dbresult.next()) {
+                newAccount = new AccountInfo(dbresult.getString("infoid"),
+                        dbresult.getString("name"),
+                        dbresult.getString("id"),
+                        dbresult.getString("email"), null);
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return newAccount;
+    }
+
+    public AccountInfo(String id, String name, String u_id, String email, String password) {
+        super(id, name);
+        this.u_id = u_id;
+        this.email = email;
+        this.password = password;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AccountInfo)) return false;
+        if (!super.equals(o)) return false;
+
+        AccountInfo that = (AccountInfo) o;
+
+        if (email != null ? !email.equals(that.email) : that.email != null) return false;
+        if (password != null ? !password.equals(that.password) : that.password != null) return false;
+        if (u_id != null ? !u_id.equals(that.u_id) : that.u_id != null) return false;
+
+        return true;
     }
 
 
@@ -43,10 +77,9 @@ public class AccountInfo extends InfoBase {
         return null;
     }
 
-    @Override
-    public String keyGenerate() {
-        int num = (int)Math.round(Math.random()*100000000);
+    public static String keyGenerate() {
 
-        return String.format("A%9d",num);
+        return InfoBase.keyGenerate("A");
     }
+
 }

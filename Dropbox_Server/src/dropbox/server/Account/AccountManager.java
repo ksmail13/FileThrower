@@ -1,17 +1,24 @@
 package dropbox.server.Account;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import dropbox.common.Message;
 import dropbox.common.MessageType;
+import dropbox.common.MessageWrapper;
 import dropbox.server.Base.ManagerBase;
 import dropbox.server.Util.DatabaseConnector;
 import dropbox.server.Util.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.mapdb.Atomic;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import sun.rmi.runtime.Log;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
@@ -39,11 +46,53 @@ public class AccountManager extends ManagerBase {
         session = db.getTreeMap(SESSION);
     }
 
-    public boolean login(SocketChannel sc, String id, String password) {
+
+    @Override
+    public void receiveMessage(SocketChannel sc, Message msg) throws IOException {
+        JSONParser parser = new JSONParser();
+        JSONObject resultJson = null;
+        Message message = null;
+        Boolean procedureResult = false;
+        try {
+            Object parseResult = parser.parse(msg.msg);
+            if(parseResult instanceof JSONObject) {
+                JSONObject parsedObject = (JSONObject)parseResult;
+                String subCategory = (String)parsedObject.get(Message.SUBCATEGORY_KEY);
+                resultJson = new JSONObject();
+
+                if("login".equals(subCategory)) {
+
+                    procedureResult = login(sc, (String) parsedObject.get("id"), (String) parsedObject.get("password"));
+                }
+                else if("logout".equals(subCategory)){}
+                else if("create".equals(subCategory)) {
+                    procedureResult = createAccount(sc, (String) parsedObject.get("id"), (String) parsedObject.get("password"),(String) parsedObject.get("email"));
+                }
+
+            }
+        } catch (ParseException e) {
+            Logger.errorLogging(e);
+        } catch (ClassCastException cce) {
+            Logger.errorLogging(cce);
+        } finally {
+            resultJson.put("result",procedureResult);
+        }
+
+        if(resultJson != null) {
+            message = new Message();
+            message.messageType = MessageType.Result;
+            message.msg = resultJson.toJSONString();
+
+            sc.write(ByteBuffer.wrap(MessageWrapper.messageToByteArray(message)));
+        }
+    }
+
+
+    public Boolean login(SocketChannel sc, String id, String password) {
         DatabaseConnector dbConn = DatabaseConnector.getConnector();
         String loginQuery = String.format("select i.infoid, a.id, i.name, a.email \n" +
                 "from infobase as i right join accountinfo as a \n" +
-                "on a.accountid = i.infoid and a.id='%s' and a.password='%s';", id, password);
+                "on a.accountid = i.infoid where a.id='%s' and a.password='%s';", id, password);
         try {
             ResultSet result = dbConn.select(loginQuery);
             AccountInfo newAccount = AccountInfo.createAccount(result);
@@ -60,30 +109,20 @@ public class AccountManager extends ManagerBase {
         return false;
     }
 
+    private Boolean createAccount(SocketChannel sc, String id, String password, String email) {
+        Boolean res = false;
 
-    @Override
-    public void receiveMessage(SocketChannel sc, Message msg) {
-        JSONParser parser = new JSONParser();
-        JSONObject result = null;
-        Message message = null;
-        try {
-            Object parseResult = parser.parse(msg.msg);
-            if(parseResult instanceof JSONObject) {
-                JSONObject parsedObject = (JSONObject)parseResult;
-                if("login".equals(parsedObject.get("SubCategory"))) {
-                    result = new JSONObject();
-                    result.put("result", login(sc, (String)parsedObject.get("id"), (String)parsedObject.get("password")));
-                }
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
+        DatabaseConnector dbConn = DatabaseConnector.getConnector();
+        String newKey = AccountInfo.keyGenerate();
+        String createQuery = String.format("insert into infobase values(%s);" +
+                "insert into accoutinfo values(%s, %s, %s, %s", newKey, newKey, id, password, email);
+        if(dbConn.modify(createQuery)) {
+            AccountInfo newAccount = new AccountInfo(newKey,"", id, email, "");
+            session.put(sc, newAccount);
+            res = true;
         }
 
-        if(result != null) {
-            message = new Message();
-            message.messageType = MessageType.Result;
-            message.msg = result.toJSONString();
-        }
+        return res;
     }
 
     /**

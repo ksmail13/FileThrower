@@ -11,13 +11,18 @@ import java.util.Date;
  * Created by micky on 2014. 11. 21..
  */
 public class FileInfo extends InfoBase {
-    protected long fileSize;
-    protected Date updateTime;
-    protected String groupId;
+    protected final long fileSize;
+    protected final Date updateTime;
+    protected final String groupId;
 
+    public FileInfo(String id, String name, long fileSize, Date updateTime, String groupId) {
+        super(id, name);
+        this.fileSize = fileSize;
+        this.updateTime = updateTime;
+        this.groupId = groupId;
+    }
 
-    @Override
-    public String keyGenerate() {
+    public static String keyGenerate() {
         int num = (int)Math.round(Math.random()*100000000);
         return String.format("F%9d",num);
     }

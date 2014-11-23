@@ -20,7 +20,7 @@ public class DatabaseConnector {
         return connector;
     }
 
-    public final static String DB_ADDR = "jdbc:postgresql://192.168.0.25:5432/dropbox";
+    public final static String DB_ADDR = "jdbc:postgresql://10.0.30.59:5432/dropbox";
     public final static String ID = "postgres";
     public final static String PASSWORD = "qufdmltnarufdldu";
 
@@ -42,14 +42,23 @@ public class DatabaseConnector {
         }
     }
 
-    public AccountInfo loginCheck(String id, String password) {
-        return null;
-    }
-
     public ResultSet select(String selectquery) throws SQLException {
         Statement st = conn.createStatement();
         ResultSet rs = st.executeQuery(selectquery);
         return rs;
+    }
+
+    public boolean modify(String query) {
+        boolean result = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement(query);
+            pst.executeQuery();
+            result = true;
+        } catch (SQLException e) {
+            Logger.errorLogging(e);
+        }
+
+        return result;
     }
 
     public static void main(String[] args) {

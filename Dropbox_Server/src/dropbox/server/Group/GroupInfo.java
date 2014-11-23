@@ -8,10 +8,15 @@ import java.util.LinkedList;
  * Created by micky on 2014. 11. 21..
  */
 public class GroupInfo extends InfoBase {
-    protected LinkedList<GroupPeopleInfo> groupPeopleList = new LinkedList<GroupPeopleInfo>();
+    protected final LinkedList<GroupPeopleInfo> groupPeopleList = new LinkedList<GroupPeopleInfo>();
+    protected final String comment;
 
-    @Override
-    public String keyGenerate() {
+    public GroupInfo(String id, String name, String comment) {
+        super(id, name);
+        this.comment = comment;
+    }
+
+    public static String keyGenerate() {
         return null;
     }
 

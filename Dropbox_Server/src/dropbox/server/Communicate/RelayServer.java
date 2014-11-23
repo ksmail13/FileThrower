@@ -3,6 +3,7 @@ package dropbox.server.Communicate;
 import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import dropbox.common.Message;
 import dropbox.common.MessageWrapper;
+import dropbox.server.Account.AccountInfo;
 import dropbox.server.Account.AccountManager;
 import dropbox.server.FileManage.FileManager;
 import dropbox.server.Group.GroupManager;
@@ -155,6 +156,10 @@ public class RelayServer {
         // 나중에 full gc에 걸리는 시간을 줄인다.
         ByteBuffer buffer = ByteBuffer.allocate(MessageWrapper.MESSAGE_SIZE);
 
+        AccountInfo loginInfo = AccountManager.getManager().getLoginInfo(sc);
+        if(loginInfo != null) {
+            Logger.logging(String.format("message from user : %s!", loginInfo.getEmail()));
+        }
         try {
             int read =0;
             int readbytes = 0;
