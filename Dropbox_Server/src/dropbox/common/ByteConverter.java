@@ -16,9 +16,9 @@ public class ByteConverter {
 
     public static byte[] intToByteArray(int val) {
         return new byte[] {
-                (byte)(val>>>32),
-                (byte)(val>>>16),
-                (byte)(val>>>8),
-                (byte)(val)};
+                (byte)((val>>>24)&0xFF),
+                (byte)((val>>>16)&0xFF),
+                (byte)((val>>>8)&0xFF),
+                (byte)((val)&0xFF)};
     }
 }
