@@ -9,8 +9,6 @@ import org.json.simple.JSONObject;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
-import javax.xml.crypto.Data;
-import java.net.Socket;
 import java.nio.channels.SocketChannel;
 import java.sql.ResultSet;
 import java.sql.SQLException;

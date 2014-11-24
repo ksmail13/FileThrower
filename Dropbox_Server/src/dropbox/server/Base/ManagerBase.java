@@ -3,6 +3,9 @@ package dropbox.server.Base;
 import dropbox.common.Message;
 import dropbox.common.MessageType;
 import dropbox.common.MessageWrapper;
+import dropbox.server.Account.AccountManager;
+import dropbox.server.FileManage.FileManager;
+import dropbox.server.Group.GroupManager;
 import dropbox.server.Util.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -39,7 +42,13 @@ public abstract class ManagerBase {
 
         if(resultJson != null) {
             message = new Message();
-            message.messageType = MessageType.Account;
+            if(AccountManager.class.equals(getClass()))
+                message.messageType = MessageType.Account;
+            else if(GroupManager.class.equals(getClass()))
+                message.messageType = MessageType.Group;
+            else if(FileManager.class.equals(getClass()))
+                message.messageType = MessageType.File;
+
             message.msg = resultJson.toJSONString();
 
             sc.write(ByteBuffer.wrap(MessageWrapper.messageToByteArray(message)));

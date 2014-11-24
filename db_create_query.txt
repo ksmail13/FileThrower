@@ -32,3 +32,68 @@ CREATE TABLE FileInfo (
                 filsSize INTEGER NOT NULL,
                 groupId CHAR(10) NOT NULL references infobase(infoid) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
+CREATE TABLE History (
+	historyId serial primary key,
+	groupId CHAR(10) NOT NULL references groupinfo(groupid) ON DELETE CASCADE ON UPDATE CASCADE,
+	accountId CHAR(10) NOT NULL references accountinfo(accountid) ON DELETE CASCADE ON UPDATE CASCADE,
+	fileId CHAR(10) NOT NULL references fileinfo(fileid) ON DELETE CASCADE ON UPDATE CASCADE,
+	jobType varchar,
+	time timestamp NOT NULL
+);
+
+Create or replace function addmember_stamp() returns trigger as $am_stp$
+begin
+	Insert into history (groupid, accountid, fileid, jobtype, time) 
+	values (NEW.groupId, NEW.accountid, '', 'adduser', now());
+	return NEW;
+END;
+$am_stp$ LANGUAGE plpgsql;
+
+CREATE TRIGGER addmember_history
+AFTER INSERT on groupmemberinfo
+FOR EACH ROW EXECUTE PROCEDURE addmember_stamp();
+
+Create or replace function addfile_stamp() returns trigger as $af_stp$
+begin
+	Insert into history (groupid, accountid, fileid, jobtype, time) 
+	values (NEW.groupId, NEW.accountid, NEW.fileid, 'addfile', now());
+	return NEW;
+END;
+$af_stp$ LANGUAGE plpgsql;
+
+CREATE TRIGGER addfile_history
+AFTER INSERT on fileinfo
+FOR EACH ROW EXECUTE PROCEDURE addfile_stamp();
+
+
+drop view accountgroupinfo;
+create view accountgroupinfo as 
+ SELECT agi.accountid AS userid,
+    agi.groupid,
+    agi.name AS groupname,
+    agi.permission,
+    agi.accept,
+    agi.comment,
+    master.accountid AS masterid,
+    master.id as masteruid
+   FROM ( SELECT agi_1.accountid,
+            agi_1.groupid,
+            agi_1.permission,
+            agi_1.accept,
+            agi_1.comment,
+            i.name
+           FROM ( SELECT gmi.accountid,
+                    gmi.groupid,
+                    gmi.permission,
+                    gmi.accept,
+                    g.comment
+                   FROM groupmemberinfo gmi
+                     LEFT JOIN groupinfo g ON gmi.groupid = g.groupid) agi_1
+             LEFT JOIN infobase i ON i.infoid = agi_1.groupid) agi
+     LEFT JOIN ( SELECT gmi.groupid,
+                    a.accountid, a.id
+                   FROM groupmemberinfo gmi
+                     LEFT JOIN accountinfo a ON gmi.accountid = a.accountid AND gmi.permission = 'M'::bpchar) master ON agi.groupid = master.groupid;
+select * from accountgroupinfo;

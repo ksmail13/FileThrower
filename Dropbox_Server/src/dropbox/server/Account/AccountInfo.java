@@ -66,7 +66,7 @@ public class AccountInfo extends InfoBase {
 
     @Override
     public String getInsertQueryString() {
-        return super.getInsertQueryString() + String.format("Insert into AccountInfo(accountInfo, id, email, password) values ('%s', '%s', '%s', '%s')",
+        return super.getInsertQueryString() + String.format("Insert into AccountInfo(accountId, id, email, password) values ('%s', '%s', '%s', '%s')",
                 id, u_id, email, password);
     }
 

@@ -1,11 +1,8 @@
 package dropbox.server.Util;
 
-import dropbox.server.Account.AccountInfo;
 import dropbox.server.Base.Queriable;
 
 import java.sql.*;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * Created by micky on 2014. 11. 21..
@@ -38,6 +35,7 @@ public class DatabaseConnector {
     private void connect() {
         try {
             conn = DriverManager.getConnection(DB_ADDR, ID, PASSWORD);
+            conn.setAutoCommit(false);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -50,12 +48,17 @@ public class DatabaseConnector {
     }
 
     public boolean modify(String query) {
+        return modify(query, true);
+    }
+
+    public boolean modify(String query, boolean commit) {
         boolean result = false;
         Logger.logging("modify query:" +query);
         try {
             PreparedStatement pst = conn.prepareStatement(query);
             pst.execute();
             result = true;
+            if(commit) commit();
         } catch (SQLException e) {
             Logger.errorLogging(e);
         }
@@ -66,4 +69,16 @@ public class DatabaseConnector {
     public boolean insert(Queriable infoObject) {
         return modify(infoObject.getInsertQueryString());
     }
+
+    public boolean insert(Queriable infoObject, boolean commit) {
+        return modify(infoObject.getInsertQueryString(), commit);
+    }
+
+    public void commit() throws SQLException {
+        conn.commit();
+    }
+    public void rollback() throws SQLException {
+        conn.rollback();
+    }
+
 }
