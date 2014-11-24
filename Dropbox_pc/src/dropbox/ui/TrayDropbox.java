@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.net.URL;
-
 import javax.swing.*;
 
 import dropbox.filemanage.DirectoryWatch;
@@ -19,13 +18,13 @@ public class TrayDropbox {
 	private static MenuItem aboutItem;
 	private static MenuItem exitItem;
 	private static String id;
-
+	
 	public TrayDropbox(File dir, String id) {
 		managerFrame = new ManagerFrame(id);
 		directoryWatch = new DirectoryWatch(dir);
 		directoryWatch.StartMonitoring();
 		this.id = id;
-		
+
 		createAndShowGUI();
 		turnOnItem.setEnabled(false);
 	}
@@ -37,7 +36,8 @@ public class TrayDropbox {
 			return;
 		}
 		final PopupMenu popup = new PopupMenu();
-		final TrayIcon trayIcon = new TrayIcon(createImage("trayicon.png", "tray icon"));
+		final TrayIcon trayIcon = new TrayIcon(createImage("trayicon.png",
+				"tray icon"));
 		final SystemTray tray = SystemTray.getSystemTray();
 
 		// Create a popup menu components
@@ -66,17 +66,18 @@ public class TrayDropbox {
 
 		trayIcon.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null, "This dialog box is run from System Tray");
+				JOptionPane.showMessageDialog(null,
+						"This dialog box is run from System Tray");
 			}
 		});
 
 		openItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//groupFrame.setVisible(true);
+				// groupFrame.setVisible(true);
 				managerFrame.show(true);
 			}
 		});
-		
+
 		turnOnItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JOptionPane.showMessageDialog(null, "Turn On");
@@ -97,7 +98,10 @@ public class TrayDropbox {
 
 		aboutItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null, "about");
+				JOptionPane
+						.showMessageDialog(
+								null,
+								"'bout Dropbox group Fuck ya'll\n\n\nKim Min Kyu\n\nKim Hee Joong\n\nBae Seung Oh");
 			}
 		});
 

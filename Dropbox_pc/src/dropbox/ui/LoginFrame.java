@@ -10,10 +10,23 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.UnknownHostException;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.SocketChannel;
 import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.jdesktop.swingx.prompt.PromptSupport;
+
+import dropbox.common.Message;
+import dropbox.common.MessageType;
+import dropbox.common.MessageWrapper;
+import dropbox.common.MySocket;
 
 import javax.swing.*;
 
@@ -21,10 +34,11 @@ public class LoginFrame extends JFrame {
 	private LoginPanel loginPanel;
 
 	private JPanel mainPanel;
-	private JTextField idTextField;
-	private JPasswordField passwdTextField;
-	private Checkbox saveAccountChkBox;
-
+	public static JTextField idTextField;
+	public static JPasswordField passwdTextField;
+	public static Checkbox saveAccountChkBox;
+	public static String stConfigPath;
+	
 	public LoginFrame() {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setTitle("Dropbox Login");
@@ -37,29 +51,32 @@ public class LoginFrame extends JFrame {
 		String configPath = this.getClass()
 				.getResource("../config/loginInfo.properties").getPath();
 		System.out.println(configPath);
+		stConfigPath = configPath;
 
 		File configFile = new File(configPath);
-		
-		boolean is_checked=false;
-		String pre_id="";
-		String pre_pw="";
 
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(configFile))) {
+		boolean is_checked = false;
+		String pre_id = "";
+		String pre_pw = "";
+
+		try (BufferedInputStream bis = new BufferedInputStream(
+				new FileInputStream(configFile))) {
 			Properties prop = new Properties();
 			prop.load(bis);
-			
+
 			is_checked = new Boolean(prop.getProperty("auto_check").trim());
 			pre_id = prop.getProperty("id").trim();
 			pre_pw = prop.getProperty("pw").trim();
-			
+
 			bis.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		saveAccountChkBox.setState(is_checked);
 		idTextField.setText(pre_id);
 		passwdTextField.setText(pre_pw);
+		
 
 		pack();
 		setResizable(false);
@@ -113,72 +130,29 @@ public class LoginFrame extends JFrame {
 				String inputPW = passwdTextField.getText().trim();
 
 				JSONObject loginJObj = new JSONObject();
-				loginJObj.put("ID", inputID);
-				loginJObj.put("PW", inputPW);
+				loginJObj.put("id", inputID);
+				loginJObj.put("password", inputPW);
+				loginJObj.put(Message.SUBCATEGORY_KEY, "login");
 				System.out.println(loginJObj);
-
-				System.out.println("log in ");
-				String osName = System.getProperty("os.name");
-				String userName = System.getProperty("user.name");
-				System.out.println(osName + "/" + userName);
-
-				File dir;
-				if (osName.contains("Windows")) {
-					dir = new File("C:/Dropbox Group");
-					if (!dir.isDirectory()) {
-						System.out.println("no dir -> make dir");
-						dir.mkdir();
-					}
-				} else if (osName.contains("Mac")) {
-					dir = new File("/users/" + userName + "/Dropbox Group");
-					if (!dir.isDirectory()) {
-						System.out.println("no dir -> make dir");
-						dir.mkdir();
-					}
-				} else {
-					dir = new File("/users/" + userName + "/Dropbox Group");
-					if (!dir.isDirectory()) {
-						System.out.println("no dir -> make dir");
-						dir.mkdir();
-					}
+				
+				Message msg = new Message();
+				msg.messageType = MessageType.Account;
+				msg.msg = loginJObj.toJSONString();
+				
+				try {
+					MySocket ms = MySocket.getConnector();
+					ms.send(msg);
+				} catch (UnknownHostException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				} catch (IOException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
 				}
 				
-				String configPath = this.getClass()
-						.getResource("../config/loginInfo.properties").getPath();
-				System.out.println(configPath);
 
-				File configFile = new File(configPath);
+				//loginFrame.setVisible(false);
 				
-				boolean is_checked=saveAccountChkBox.getState();
-				String pre_id=idTextField.getText().trim();
-				String pre_pw=passwdTextField.getText().trim();
-				
-				if(!is_checked){
-					pre_id = "";
-					pre_pw = "";
-				}
-
-				try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(configFile))) {
-					Properties prop = new Properties();
-					prop.load(bis);
-					
-					prop.setProperty("auto_check", is_checked+"");
-					prop.setProperty("id", pre_id);
-					prop.setProperty("pw", pre_pw);
-					
-					FileOutputStream fos = new FileOutputStream(configFile);
-					
-					prop.store(fos, "");
-					fos.flush();
-					bis.close();
-					fos.close();
-					
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-				
-				loginFrame.setVisible(false);
-				new TrayDropbox(dir, inputID);
 			} else if (e.getActionCommand().equals("Sign Up")) {
 				System.out.println("Sign Up");
 				new SignUpFrame();

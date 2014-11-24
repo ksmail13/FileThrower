@@ -1,53 +1,61 @@
 package dropbox.ui;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 
-import org.json.simple.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import dropbox.config.ButtonColumn;
 import dropbox.groupmanage.GroupManager;
 
-public class ManagerFrame extends JFrame implements MouseListener, ActionListener {
+public class ManagerFrame extends JFrame implements MouseListener,
+		ActionListener {
 	private JPopupMenu groupPopup;
 
-	private JTable groupTable;
-	private JTable memberTable;
-	
+	public static JTable groupTable;
+	public static JTable memberTable;
+
 	private JTextField newMemberField;
 
 	private String selectedGroupName;
 	private String selectedGroupLeader;
+	private String selectedGroupId;
 	private String id;
+	
+	public static CreateGroupFrame createGroupFrame;
 
 	public ManagerFrame(String id) {
 		this.id = id;
-		setSize(600, 350);
+		setSize(800, 350);
 
 		Box mainBox = Box.createHorizontalBox();
 
 		Box leftBox = Box.createVerticalBox();
+		JPanel subPane01 = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JLabel groupLabel = new JLabel("Group List");
+		subPane01.add(groupLabel);
 
 		String[] tableHeads = { "Group Name", "Leader" };
 		DefaultTableModel groupHeadModel = new DefaultTableModel(tableHeads, 0);
-		groupHeadModel.addRow(new Object[] { "Group01", "Leader01" });
-		groupHeadModel.addRow(new Object[] { "Group02", "Leader02" });
-		groupHeadModel.addRow(new Object[] { "Group03", "Leader03" });
-		groupHeadModel.addRow(new Object[] { "Group04", "Leader04" });
 
 		groupTable = new JTable(groupHeadModel);
 		groupTable.getTableHeader().setReorderingAllowed(false);
 		groupTable.getTableHeader().setResizingAllowed(false);
 		JScrollPane groupTablePanel = new JScrollPane(groupTable);
+		groupTable.getTableHeader().setPreferredSize(new Dimension(500, 20));
 
 		groupPopup = new JPopupMenu();
 		JMenuItem exitGroupItem = new JMenuItem("Exit Group");
@@ -64,59 +72,110 @@ public class ManagerFrame extends JFrame implements MouseListener, ActionListene
 
 		groupTable.addMouseListener(this);
 
+		JPanel subPane04 = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JButton createGroupButton = new JButton("Create New Group");
+		subPane04.add(createGroupButton);
 		createGroupButton.addActionListener(this);
 
-		leftBox.add(groupLabel);
+		leftBox.add(subPane01);
 		leftBox.add(groupTablePanel);
-		leftBox.add(createGroupButton);
+		leftBox.add(subPane04);
 
 		Box middleBox = Box.createVerticalBox();
+		JPanel subPane02 = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JLabel memberLabel = new JLabel("Member List");
+		subPane02.add(memberLabel);
 
-		String[] memberHeads = { "ID" };
-		DefaultTableModel memberHeadModel = new DefaultTableModel(memberHeads,
-				0);
+		DefaultTableModel memberHeadModel = new DefaultTableModel(
+				new Object[] { "Member ID" }, 0);
 		memberTable = new JTable(memberHeadModel);
 		memberTable.getTableHeader().setReorderingAllowed(false);
 		memberTable.getTableHeader().setResizingAllowed(false);
+		memberTable.getTableHeader().setPreferredSize(new Dimension(500, 20));
 
 		JScrollPane memberTablePanel = new JScrollPane(memberTable);
 
-		Box inviteSubBox = Box.createHorizontalBox();
-		newMemberField = new JTextField();
+		JPanel inviteSubBox = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		newMemberField = new JTextField(13);
 		JButton inviteButton = new JButton("Invite");
 		inviteButton.addActionListener(this);
 		inviteSubBox.add(newMemberField);
 		inviteSubBox.add(inviteButton);
 
-		middleBox.add(memberLabel);
+		middleBox.add(subPane02);
 		middleBox.add(memberTablePanel);
 		middleBox.add(inviteSubBox);
-		
+
 		Box rightBox = Box.createVerticalBox();
+		JPanel subPane03 = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JLabel historyLabel = new JLabel("History");
-		
+		subPane03.add(historyLabel);
+
 		JPanel pane1 = new JPanel();
 		pane1.add(new JLabel("do you wanna ?"));
-		
+
 		JPanel pane2 = new JPanel();
 		pane1.add(new JLabel("File Transmit Group/File"));
-		
-		String[] items = {"aaa", "bbb", "ccc"}; 
-		JPanel[] itmess = {pane1, pane2};
-		JList historyList = new JList(itmess);
-		JScrollPane historyListPanel = new JScrollPane(historyList);
-		
-		rightBox.add(historyLabel);
+
+		String[] items = { "aaa", "bbb", "ccc" };
+		JPanel[] itmess = { pane1, pane2 };
+
+		DefaultTableModel historyTableModel = new DefaultTableModel(
+				new String[] { "Contents", "" }, 0);
+		historyTableModel.addRow(new Object[] { "Do Yo Wanna Join 'Group'?",
+				"Yes" });
+		historyTableModel.addRow(new Object[] { "File Transmit 'Group/File'",
+				"Check" });
+		historyTableModel.addRow(new Object[] { "File Delete 'Group/File'",
+				"Check" });
+		historyTableModel.addRow(new Object[] { "Do Yo Wanna Join 'Group'?",
+				"Yes" });
+
+		JTable historyTable = new JTable(historyTableModel);
+		historyTable.getTableHeader().setReorderingAllowed(false);
+		historyTable.getTableHeader().setResizingAllowed(false);
+		historyTable.getTableHeader().setPreferredSize(new Dimension(500, 20));
+
+		for (int i = 0; i < historyTable.getColumnCount(); i++) {
+			TableColumn column = historyTable.getColumnModel().getColumn(i);
+			if (i == 0) {
+				column.setPreferredWidth(170);
+			} else if (i == 1) {
+				column.setPreferredWidth(60);
+			}
+		}
+
+		Action delete = new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				JTable table = (JTable) e.getSource();
+				int modelRow = Integer.valueOf(e.getActionCommand());
+				((DefaultTableModel) table.getModel()).removeRow(modelRow);
+			}
+		};
+
+		ButtonColumn buttonColumn = new ButtonColumn(historyTable, delete, 1);
+		buttonColumn.setMnemonic(KeyEvent.VK_D);
+
+		JScrollPane historyListPanel = new JScrollPane(historyTable);
+
+		rightBox.add(subPane03);
 		rightBox.add(historyListPanel);
-		
 
 		mainBox.add(leftBox);
 		mainBox.add(middleBox);
 		mainBox.add(rightBox);
 		add(mainBox);
 
+		
+		try {
+			new GroupManager(GroupManager.SELECT_GROUP);
+		} catch (JSONException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		pack();
+		setSize(800, 400);
 		setResizable(false);
 		setVisible(true);
 	}
@@ -125,23 +184,44 @@ public class ManagerFrame extends JFrame implements MouseListener, ActionListene
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getActionCommand().equals("Create New Group")) {
-			new CreateGroupFrame();
+			createGroupFrame = new CreateGroupFrame();
 		} else if (e.getActionCommand().equals("Invite")) {
 			JOptionPane.showMessageDialog(null, "is exited user?");
 			String newMemberID = newMemberField.getText().trim();
-			new GroupManager(GroupManager.INVITE, selectedGroupName, selectedGroupLeader, newMemberID);
+			try {
+				new GroupManager(GroupManager.INVITE, selectedGroupName,
+						selectedGroupLeader, newMemberID);
+			} catch (JSONException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		} else if (e.getActionCommand().equals("Exit Group")) {
-			if(id.equals(selectedGroupLeader)){
-				JOptionPane.showMessageDialog(null, "You are leader of the group.\n Leader can't exit group.");
+			if (id.equals(selectedGroupLeader)) {
+				JOptionPane
+						.showMessageDialog(null,
+								"You are leader of the group.\n Leader can't exit group.");
 				return;
 			}
-			new GroupManager(GroupManager.EXIT_GROUP, selectedGroupName, selectedGroupLeader, "");
+			try {
+				new GroupManager(GroupManager.EXIT_GROUP, selectedGroupName,
+						selectedGroupLeader, "");
+			} catch (JSONException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		} else if (e.getActionCommand().equals("Delete Group")) {
-			if(!id.equals(selectedGroupLeader)){
-				JOptionPane.showMessageDialog(null, "Only leader can delete group.");
+			if (!id.equals(selectedGroupLeader)) {
+				JOptionPane.showMessageDialog(null,
+						"Only leader can delete group.");
 				return;
 			}
-			new GroupManager(GroupManager.DELETE_GROUP, selectedGroupName, selectedGroupLeader, "");
+			try {
+				new GroupManager(GroupManager.DELETE_GROUP, selectedGroupName,
+						selectedGroupLeader, "");
+			} catch (JSONException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		} else if (e.getActionCommand().equals("Group Info")) {
 			JOptionPane.showMessageDialog(null, "Group Info");
 		}
@@ -158,41 +238,49 @@ public class ManagerFrame extends JFrame implements MouseListener, ActionListene
 			}
 			System.out.println(row);
 
-			selectedGroupName = ((String) table.getModel().getValueAt(row, 0))
-					.trim();
-			selectedGroupLeader = ((String) table.getModel().getValueAt(row, 1))
-					.trim();
-
-			String[] memberHeads = { "ID" };
-			DefaultTableModel groupHeadModel1 = new DefaultTableModel(
-					memberHeads, 0);
-			DefaultTableModel groupHeadModel2 = new DefaultTableModel(
-					memberHeads, 0);
-			DefaultTableModel groupHeadModel3 = new DefaultTableModel(
-					memberHeads, 0);
-			DefaultTableModel groupHeadModel4 = new DefaultTableModel(
-					memberHeads, 0);
-			groupHeadModel1.addRow(new Object[] { "Member1_1" });
-			groupHeadModel1.addRow(new Object[] { "Member1_2" });
-			groupHeadModel2.addRow(new Object[] { "Member2_1" });
-			groupHeadModel2.addRow(new Object[] { "Member2_2" });
-			groupHeadModel3.addRow(new Object[] { "Member3_1" });
-			groupHeadModel3.addRow(new Object[] { "Member3_2" });
-			groupHeadModel4.addRow(new Object[] { "Member4_1" });
-			groupHeadModel4.addRow(new Object[] { "Member4_2" });
-
-			if (row == 1) {
-				memberTable.setModel(groupHeadModel1);
+			selectedGroupName = ((String) table.getModel().getValueAt(row, 0)).trim();
+			selectedGroupLeader = ((String) table.getModel().getValueAt(row, 1)).trim();
+			selectedGroupId = ((String) table.getModel().getValueAt(row, 2)).trim();
+			System.out.println("gname : "+selectedGroupName + " g_id : "+selectedGroupId);
+			
+			try {
+				new GroupManager(GroupManager.SELECT_MEMBER, selectedGroupId);
+			} catch (JSONException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
-			if (row == 2) {
-				memberTable.setModel(groupHeadModel2);
-			}
-			if (row == 3) {
-				memberTable.setModel(groupHeadModel3);
-			}
-			if (row == 4) {
-				memberTable.setModel(groupHeadModel4);
-			}
+			
+//			
+//			String[] memberHeads = { "ID" };
+//			DefaultTableModel groupHeadModel1 = new DefaultTableModel(
+//					memberHeads, 0);
+//			DefaultTableModel groupHeadModel2 = new DefaultTableModel(
+//					memberHeads, 0);
+//			DefaultTableModel groupHeadModel3 = new DefaultTableModel(
+//					memberHeads, 0);
+//			DefaultTableModel groupHeadModel4 = new DefaultTableModel(
+//					memberHeads, 0);
+//			groupHeadModel1.addRow(new Object[] { "Member1_1" });
+//			groupHeadModel1.addRow(new Object[] { "Member1_2" });
+//			groupHeadModel2.addRow(new Object[] { "Member2_1" });
+//			groupHeadModel2.addRow(new Object[] { "Member2_2" });
+//			groupHeadModel3.addRow(new Object[] { "Member3_1" });
+//			groupHeadModel3.addRow(new Object[] { "Member3_2" });
+//			groupHeadModel4.addRow(new Object[] { "Member4_1" });
+//			groupHeadModel4.addRow(new Object[] { "Member4_2" });
+//
+//			if (row == 1) {
+//				memberTable.setModel(groupHeadModel1);
+//			}
+//			if (row == 2) {
+//				memberTable.setModel(groupHeadModel2);
+//			}
+//			if (row == 3) {
+//				memberTable.setModel(groupHeadModel3);
+//			}
+//			if (row == 4) {
+//				memberTable.setModel(groupHeadModel4);
+//			}
 		}
 
 		if (e.getButton() == 3) { // 우클릭시
