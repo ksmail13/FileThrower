@@ -8,7 +8,7 @@ import java.util.LinkedList;
  * Created by micky on 2014. 11. 21..
  */
 public class GroupInfo extends InfoBase {
-    protected final LinkedList<GroupPeopleInfo> groupPeopleList = new LinkedList<GroupPeopleInfo>();
+    protected final LinkedList<GroupMemberInfo> groupPeopleList = new LinkedList<GroupMemberInfo>();
     protected final String comment;
 
     public GroupInfo(String id, String name, String comment) {
@@ -20,14 +20,14 @@ public class GroupInfo extends InfoBase {
         return InfoBase.keyGenerate("G");
     }
 
-    public void addGroupMember(GroupPeopleInfo newMember) {
+    public void addGroupMember(GroupMemberInfo newMember) {
         groupPeopleList.add(newMember);
     }
 
     @Override
     public String getInsertQueryString() {
 //        StringBuilder sb = new StringBuilder();
-//        for(GroupPeopleInfo info : groupPeopleList) {
+//        for(GroupMemberInfo info : groupPeopleList) {
 //            sb.append("\""+info.getGroupInfo()+"\"");
 //            sb.append(",");
 //        }

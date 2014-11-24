@@ -1,15 +1,24 @@
 package dropbox.test;
 
 import dropbox.common.ByteConverter;
+import dropbox.common.Message;
+import dropbox.common.MessageType;
+import dropbox.common.MessageWrapper;
 import dropbox.server.Util.DatabaseConnector;
+import dropbox.server.Util.Logger;
+import org.json.simple.JSONObject;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Serializer;
+import sun.rmi.runtime.Log;
 
 import javax.xml.crypto.Data;
 import java.io.*;
+import java.net.Socket;
 import java.sql.SQLException;
 import java.util.Map;
+
+import static java.lang.Thread.*;
 
 /**
  * Created by micky on 2014. 11. 22..
@@ -29,6 +38,53 @@ public class Test {
 
         byte[] len = ByteConverter.intToByteArray(242);
         System.out.println(ByteConverter.byteArrayToInt(len[3],len[2], len[1], len[0]));
+
+        try {
+            Socket socket = new Socket("localhost", 8080);
+            JSONObject obj = new JSONObject();
+
+
+            Message msg = new Message();
+
+            msg.messageType = MessageType.Account;
+            obj.put(Message.SUBCATEGORY_KEY, "login");
+            obj.put("id", "aa");
+            obj.put("password", "a");
+
+            msg.msg = obj.toJSONString();
+
+            byte[] byteMsg = MessageWrapper.messageToByteArray(msg);
+            socket.getOutputStream().write(byteMsg);
+
+            obj.clear();
+
+            socket.getInputStream().read(byteMsg);
+            //Message rmsg = MessageWrapper.byteArrayToMessage(byteMsg);
+
+            //Logger.logging(rmsg.messageType+"");
+            //Logger.logging(rmsg.msg);
+
+            obj.put(Message.SUBCATEGORY_KEY, "grouplist");
+
+            msg.messageType = MessageType.Group;
+            msg.msg = obj.toJSONString();
+            byteMsg = MessageWrapper.messageToByteArray(msg);
+            socket.getOutputStream().write(byteMsg);
+
+            sleep(2000L);
+            socket.getInputStream().read(byteMsg);
+            Message rmsg = MessageWrapper.byteArrayToMessage(byteMsg);
+
+            Logger.logging(rmsg.messageType+"");
+            Logger.logging(rmsg.msg);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**

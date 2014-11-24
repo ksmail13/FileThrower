@@ -34,7 +34,7 @@ public class Logger {
         DateFormat df = new SimpleDateFormat("MM-dd a hh:mm:ss");
         target.printf("[%s] %s",df.format(Calendar.getInstance().getTime()),  message == null?"":message);
         if(t != null) {
-            target.print(t.getLocalizedMessage());
+            target.println(t.getLocalizedMessage());
             //target.print(t.getStackTrace()[0].toString());
             t.printStackTrace();
         }

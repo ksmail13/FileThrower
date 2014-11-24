@@ -50,7 +50,7 @@ public abstract class ManagerBase {
                 message.messageType = MessageType.File;
 
             message.msg = resultJson.toJSONString();
-
+            Logger.debugLogging("send message : "+message.msg);
             sc.write(ByteBuffer.wrap(MessageWrapper.messageToByteArray(message)));
         }
     }

@@ -1,5 +1,6 @@
 package dropbox.server.Communicate;
 
+import dropbox.server.Util.Logger;
 import sun.misc.ThreadGroupUtils;
 
 /**
@@ -23,24 +24,16 @@ public class ServerManager {
     private RelayServer relayServer;
     private FileServer fileServer;
 
-    private Thread relayServerThread;
 
     private ServerManager() {}
 
     public void startServer() {
-        relayServerThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                relayServer = new RelayServer(DEFAULT_IP, DEFAULT_PORT);
-                relayServer.startServer();
-            }
-        });
-        relayServerThread.setDaemon(true);
-        relayServerThread.start();
 
-        fileServer = new FileServer();
+        relayServer = new RelayServer(DEFAULT_IP, DEFAULT_PORT);
+        relayServer.startServer();
 
-        fileServer.startServer(DEFAULT_PORT+1);
+        fileServer = new FileServer(DEFAULT_PORT+1);
+        fileServer.startServer();
     }
 
 }

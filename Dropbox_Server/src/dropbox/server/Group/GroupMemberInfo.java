@@ -6,14 +6,14 @@ import dropbox.server.Base.Queriable;
 /**
  * Created by micky on 2014. 11. 21..
  */
-public class GroupPeopleInfo implements Queriable{
+public class GroupMemberInfo implements Queriable{
     protected GroupInfo groupInfo;
     protected AccountInfo accountInfo;
     protected char permission;
 
     protected boolean accept = false;
 
-    public GroupPeopleInfo(GroupInfo groupInfo, AccountInfo accountInfo, char permission, boolean accept) {
+    public GroupMemberInfo(GroupInfo groupInfo, AccountInfo accountInfo, char permission, boolean accept) {
         this.groupInfo = groupInfo;
         this.accountInfo = accountInfo;
         this.permission = permission;
@@ -46,11 +46,13 @@ public class GroupPeopleInfo implements Queriable{
 
     @Override
     public String getInsertQueryString() {
-        return String.format("insert into groupmemberinfo (groupid, accountid, permission) values ('%s', '%s', '%c');", groupInfo.getId(), accountInfo.getId(), permission);
+        return String.format("insert into groupmemberinfo (groupid, accountid, permission, accept) values ('%s', '%s', '%c', '%s');", groupInfo.getId(), accountInfo.getId(), permission, accept);
     }
 
     @Override
     public String getSelectQueryString() {
         return null;
     }
+
+
 }

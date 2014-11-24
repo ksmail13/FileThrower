@@ -14,8 +14,9 @@ public class FileInfo extends InfoBase {
     protected final long fileSize;
     protected final Date updateTime;
     protected final String groupId;
+    protected final boolean uploadComplete = false;
 
-    public FileInfo(String id, String name, long fileSize, Date updateTime, String groupId) {
+    public FileInfo(String id, String name, long fileSize, Date updateTime, String groupId, boolean uploadComplete) {
         super(id, name);
         this.fileSize = fileSize;
         this.updateTime = updateTime;

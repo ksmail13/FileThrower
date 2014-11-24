@@ -18,7 +18,8 @@ public class DatabaseConnector {
         return connector;
     }
 
-    public final static String DB_ADDR = "jdbc:postgresql://10.0.30.59:5432/dropbox";
+    public final static String DB_ADDR = "jdbc:postgresql://10.0.27.234:5432/dropbox";
+    //public final static String DB_ADDR = "jdbc:postgresql://1920.168.0.25:5432/dropbox";
     public final static String ID = "postgres";
     public final static String PASSWORD = "qufdmltnarufdldu";
 

@@ -109,17 +109,22 @@ public class AccountManager extends ManagerBase {
         session.remove(sc);
     }
 
-    public AccountInfo getUserInfo(String inviteId) {
-        return cache.get(inviteId);
+    public AccountInfo getUserInfo(String userId) {
+        return cache.get(userId);
+    }
+
+    public SocketChannel getSession(AccountInfo accountInfo) {
+        return session.getAccountConnectedSocket(accountInfo);
     }
 
     /**
      * 계정과 현재 연결된 소켓을 관리하는 클래스
      */
     class SessionManager {
-        public final static String SESSION = "session";
-
-        Map<SocketChannelWrapper, AccountInfo> session;
+        public final static String SESSION = "sessionAccount";
+        public final static String ACCOUNTSESSION = "accountSession";
+        Map<SocketChannelWrapper, AccountInfo> sessionAccount;
+        Map<AccountInfo, SocketChannelWrapper> accountSession;
 
         SessionManager() {
             sessionInit();
@@ -127,12 +132,12 @@ public class AccountManager extends ManagerBase {
 
         private void sessionInit() {
             DB db = DBMaker.newMemoryDB().transactionDisable().closeOnJvmShutdown().make();
-            session = db.getTreeMap(SESSION);
-
+            sessionAccount = db.getTreeMap(SESSION);
+            accountSession = db.getTreeMap(ACCOUNTSESSION);
         }
 
         public AccountInfo get(SocketChannelWrapper scw) {
-            return session.get(scw);
+            return sessionAccount.get(scw);
         }
 
         public AccountInfo get(SocketChannel sc) {
@@ -142,16 +147,39 @@ public class AccountManager extends ManagerBase {
             return get(scw);
         }
 
+        public SocketChannel getAccountConnectedSocket(AccountInfo accountInfo) {
+            SocketChannelWrapper scw = accountSession.get(accountInfo);
+            if(scw != null)
+                return scw.getSocketChannel();
+            else
+                return null;
+        }
+
         public void put(SocketChannelWrapper scw, AccountInfo newAccount) {
-            session.put(scw, newAccount);
+            sessionAccount.put(scw, newAccount);
+            accountSession.put(newAccount, scw);
         }
 
+        /**
+         * 소켓에 대응되는 계정정보를 저장한다.
+         * 계정정보에 대응되는 소켓을 저장한다.
+         * @param sc
+         * @param newAccount
+         */
         public void put(SocketChannel sc, AccountInfo newAccount) {
-            session.put(new SocketChannelWrapper(sc), newAccount);
+            sessionAccount.put(new SocketChannelWrapper(sc), newAccount);
+            accountSession.put(newAccount, new SocketChannelWrapper(sc));
         }
 
+        /**
+         * 세션 제거
+         * @param sc
+         */
         public void remove(SocketChannel sc) {
-            session.remove(new SocketChannelWrapper(sc));
+            // 로그아웃한 시간을 기록한다.
+            String logoutHistory = String.format("insert into history (jobtype, time, accountid) values('logout', now(), '%s');", get(sc).getId());
+            DatabaseConnector.getConnector().modify(logoutHistory);
+            sessionAccount.remove(new SocketChannelWrapper(sc));
         }
     }
 

@@ -25,7 +25,7 @@ import java.util.Iterator;
  * 클라이언트로부터 메시지를 받아 파싱한 후 그에 대응하는 작업을 진행한다.
  * 중계 서버 인스턴스는 하나의 프로세스에 하나만 존재한다.
  */
-public class RelayServer {
+public class RelayServer implements Runnable{
 
     // static end
 
@@ -36,6 +36,8 @@ public class RelayServer {
     private GroupManager groupManager = null;
     private FileManager fileManager = null;
     private AccountManager accountManager = null;
+
+    private Thread relayThread = null;
 
     RelayServer(String ip, int port){
         this(new InetSocketAddress(ip, port));
@@ -72,29 +74,13 @@ public class RelayServer {
      * 서버 구동
      */
     public void startServer() {
-        Logger.logging("Server Start");
+        relayThread = new Thread(this);
+        relayThread.setDaemon(true);
+        relayThread.start();
+    }
 
-        try {
-            while(true) {
-                Logger.logging("selecting!");
-                selector.select();
-                Iterator<SelectionKey> kit = selector.selectedKeys().iterator();
-                while (kit.hasNext()) {
-                    SelectionKey selectKey = kit.next();
-                    if(selectKey.isAcceptable()) {
-                        connectAcceptClient(selectKey);
-                    }
-                    else if(selectKey.isReadable()){
-                        receiveMessage(selectKey);
-                    }
-                    kit.remove();
-                }
-            }
-        }
-        catch(IOException ioe) {
-            Logger.errorLogging("", ioe);
-        }
-
+    public void stopServer() {
+        relayThread.interrupt();
     }
 
     /**
@@ -235,5 +221,32 @@ public class RelayServer {
     }
 
 
+    /**
+     * 실제 select함수를 실행하는 부분
+     */
+    @Override
+    public void run() {
+        Logger.logging("Server Start");
 
+        try {
+            while(true) {
+                Logger.logging("selecting!");
+                selector.select();
+                Iterator<SelectionKey> kit = selector.selectedKeys().iterator();
+                while (kit.hasNext()) {
+                    SelectionKey selectKey = kit.next();
+                    if(selectKey.isAcceptable()) {
+                        connectAcceptClient(selectKey);
+                    }
+                    else if(selectKey.isReadable()){
+                        receiveMessage(selectKey);
+                    }
+                    kit.remove();
+                }
+            }
+        }
+        catch(IOException ioe) {
+            Logger.errorLogging("", ioe);
+        }
+    }
 }
