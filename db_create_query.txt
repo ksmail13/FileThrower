@@ -68,32 +68,50 @@ AFTER INSERT on fileinfo
 FOR EACH ROW EXECUTE PROCEDURE addfile_stamp();
 
 
-drop view accountgroupinfo;
-create view accountgroupinfo as 
- SELECT agi.accountid AS userid,
-    agi.groupid,
-    agi.name AS groupname,
-    agi.permission,
-    agi.accept,
-    agi.comment,
-    master.accountid AS masterid,
-    master.id as masteruid
-   FROM ( SELECT agi_1.accountid,
-            agi_1.groupid,
-            agi_1.permission,
-            agi_1.accept,
-            agi_1.comment,
-            i.name
-           FROM ( SELECT gmi.accountid,
-                    gmi.groupid,
-                    gmi.permission,
-                    gmi.accept,
-                    g.comment
-                   FROM groupmemberinfo gmi
-                     LEFT JOIN groupinfo g ON gmi.groupid = g.groupid) agi_1
-             LEFT JOIN infobase i ON i.infoid = agi_1.groupid) agi
-     LEFT JOIN ( SELECT gmi.groupid,
-                    a.accountid, a.id
-                   FROM groupmemberinfo gmi
-                     LEFT JOIN accountinfo a ON gmi.accountid = a.accountid AND gmi.permission = 'M'::bpchar) master ON agi.groupid = master.groupid;
-select * from accountgroupinfo;
+create or replace function accountgroupinfo(char(10))
+	returns table(groupid char(10), groupcomment varchar, groupname varchar, masterid char(10), mastername varchar)
+ as $$
+select
+	g.groupid,
+	groupcomment,
+	groupname,
+	masterid,
+	mastername
+from
+	(select 
+		groupid,
+		groupcomment,
+		groupname,
+		masterid,
+		i.name as mastername
+	from
+		(select 
+			gi.groupid, 
+			groupcomment, 
+			i.name as groupname,
+			masterid
+		from
+			(select 
+				g.groupid,
+				g.comment as groupcomment,
+				accountid as masterid
+			from
+				groupinfo as g,
+				groupmemberinfo as gmi
+			where	
+				g.groupid=gmi.groupid
+				and gmi.permission='M') as gi,
+			infobase as i
+		where
+			gi.groupid = i.infoid) as g
+	left join
+		infobase as i
+	on g.masterid = i.infoid) as g
+,
+	groupmemberinfo as gmi
+where
+	g.groupid = gmi.groupid
+	and
+	gmi.accountid=$1;
+$$
+language sql;

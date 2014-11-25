@@ -113,7 +113,7 @@ public final class Bind {
     /**
      * Binds {@link Atomic.Long} to Primary Map so the Atomic.Long contains size of Map.
      * {@code Atomic.Long} is incremented on each insert and decremented on each entry removal.
-     * MapDB collections usually do not keep their size, but require complete traversal to count items.
+     * MapDB collections usually do not keep their size, but require complete traversal to sessionCount items.
      *
      * If {@code Atomic.Long} has zero value, it will be updated with value from {@code map.size()} and than
      * bind to map.
@@ -632,7 +632,7 @@ public final class Bind {
 
     /**
      * Binds Secondary Map so it it creates [histogram](http://en.wikipedia.org/wiki/Histogram) from
-     * data in Primary Map. Histogram keeps count how many items are in each category.
+     * data in Primary Map. Histogram keeps sessionCount how many items are in each category.
      * This method takes function which defines in what category each Primary Map entry is in.
      *
      *
@@ -690,13 +690,13 @@ public final class Bind {
                     Long oldCount = histogram.get(category);
                     if(oldCount == null){
                         //$DELAY$
-                        //insert new count
+                        //insert new sessionCount
                         if(histogram.putIfAbsent(category,i) == null) {
                             //$DELAY$
                             return;
                         }
                     }else{
-                        //increase existing count
+                        //increase existing sessionCount
                         //$DELAY$
                         Long newCount = oldCount+i;
                         if(histogram.replace(category,oldCount, newCount)) {

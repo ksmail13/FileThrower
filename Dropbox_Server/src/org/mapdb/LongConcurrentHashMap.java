@@ -177,17 +177,17 @@ public class LongConcurrentHashMap< V>
          * Read operations can thus proceed without locking, but rely
          * on selected uses of volatiles to ensure that completed
          * write operations performed by other threads are
-         * noticed. For most purposes, the "count" field, tracking the
+         * noticed. For most purposes, the "sessionCount" field, tracking the
          * number of elements, serves as that volatile variable
          * ensuring visibility.  This is convenient because this field
          * needs to be read in many read operations anyway:
          *
          *   - All (unsynchronized) read operations must first read the
-         *     "count" field, and should not look at table entries if
+         *     "sessionCount" field, and should not look at table entries if
          *     it is 0.
          *
          *   - All (synchronized) write operations should write to
-         *     the "count" field after structurally changing any bin.
+         *     the "sessionCount" field after structurally changing any bin.
          *     The operations must not take any action that could even
          *     momentarily cause a concurrent read operation to see
          *     inconsistent data. This is made easier by the nature of
@@ -197,7 +197,7 @@ public class LongConcurrentHashMap< V>
          *     requirements for this with respect to reads.
          *
          * As a guide, all critical volatile reads and writes to the
-         * count field are marked in code comments.
+         * sessionCount field are marked in code comments.
          */
 
         private static final long serialVersionUID = 2249069246763182397L;
@@ -635,7 +635,7 @@ public class LongConcurrentHashMap< V>
         long sum = 0;
         long check = 0;
         int[] mc = new int[segments.length];
-        // Try a few times to get accurate count. On failure due to
+        // Try a few times to get accurate sessionCount. On failure due to
         // continuous async changes in table, resort to locking.
         for (int k = 0; k < RETRIES_BEFORE_LOCK; ++k) {
             check = 0;
@@ -735,7 +735,7 @@ public class LongConcurrentHashMap< V>
             //int sum = 0;
             int mcsum = 0;
             for (int i = 0; i < segments.length; ++i) {
-                //int c = segments[i].count;
+                //int c = segments[i].sessionCount;
                 mcsum += mc[i] = segments[i].modCount;
                 if (segments[i].containsValue(value))
                     return true;
@@ -743,7 +743,7 @@ public class LongConcurrentHashMap< V>
             boolean cleanSweep = true;
             if (mcsum != 0) {
                 for (int i = 0; i < segments.length; ++i) {
-                    //int c = segments[i].count;
+                    //int c = segments[i].sessionCount;
                     if (mc[i] != segments[i].modCount) {
                         cleanSweep = false;
                         break;

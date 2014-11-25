@@ -356,7 +356,7 @@ public class HTreeMap<K,V>   extends AbstractMap<K,V> implements ConcurrentMap<K
                     recid = recid>>>1;
                     counter += recursiveDirCount(recid);
                 }else{
-                    //reference to linked list, count it
+                    //reference to linked list, sessionCount it
                     recid = recid>>>1;
                     while(recid!=0){
                         LinkedNode n = engine.get(recid, LN_SERIALIZER);

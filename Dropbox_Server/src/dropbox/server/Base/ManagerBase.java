@@ -21,12 +21,6 @@ import java.nio.channels.SocketChannel;
  */
 public abstract class ManagerBase {
 
-    public static ManagerBase getInstance() {
-        return null;
-    }
-
-
-
     public void receiveMessage(SocketChannel sc, Message msg) throws IOException {
         JSONObject resultJson = null;
         Message message = null;
@@ -50,7 +44,7 @@ public abstract class ManagerBase {
                 message.messageType = MessageType.File;
 
             message.msg = resultJson.toJSONString();
-            Logger.debugLogging("send message : "+message.msg);
+            Logger.debugLogging("send result message : "+message.msg);
             sc.write(ByteBuffer.wrap(MessageWrapper.messageToByteArray(message)));
         }
     }

@@ -12,20 +12,18 @@ import java.util.Date;
  */
 public class FileInfo extends InfoBase {
     protected final long fileSize;
-    protected final Date updateTime;
     protected final String groupId;
-    protected final boolean uploadComplete = false;
+    protected final boolean uploadComplete;
 
-    public FileInfo(String id, String name, long fileSize, Date updateTime, String groupId, boolean uploadComplete) {
+    public FileInfo(String id, String name, long fileSize, String groupId, boolean uploadComplete) {
         super(id, name);
         this.fileSize = fileSize;
-        this.updateTime = updateTime;
         this.groupId = groupId;
+        this.uploadComplete = uploadComplete;
     }
 
     public static String keyGenerate() {
-        int num = (int)Math.round(Math.random()*100000000);
-        return String.format("F%9d",num);
+        return InfoBase.keyGenerate("F");
     }
 
     @Override
@@ -33,7 +31,7 @@ public class FileInfo extends InfoBase {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
         return super.getInsertQueryString() +
-                String.format("Insert into FileInfo(infoId, fileSize, groupInfo, updateTime) values ('%s', '%s', '%s', '%s');",
+                String.format("Insert into fileinfo (fileid, filesize, groupid) values ('%s', '%s', '%s');",
                         id, fileSize, groupId, df.format(Calendar.getInstance().getTime()));
     }
 

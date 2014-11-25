@@ -29,7 +29,7 @@ public class LongHashMap<V> extends LongMap<V> implements Serializable {
     private static final long serialVersionUID = 362340234235222265L;
 
     /*
-     * Actual count of entries
+     * Actual sessionCount of entries
      */
     transient int elementCount;
 
@@ -39,7 +39,7 @@ public class LongHashMap<V> extends LongMap<V> implements Serializable {
     transient Entry<V>[] elementData;
 
     /*
-     * modification count, to keep track of structural modifications between the
+     * modification sessionCount, to keep track of structural modifications between the
      * HashMap and the iterator
      */
     transient int modCount = 0;

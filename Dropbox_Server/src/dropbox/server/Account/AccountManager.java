@@ -13,6 +13,7 @@ import java.nio.channels.SocketChannel;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by micky on 2014. 11. 21..
@@ -69,6 +70,9 @@ public class AccountManager extends ManagerBase {
 
                 return true;
             }
+            else {
+                Logger.errorLogging("fail get login account" , null);
+            }
 
         } catch (SQLException e) {
             Logger.errorLogging(e);
@@ -114,7 +118,30 @@ public class AccountManager extends ManagerBase {
     }
 
     public SocketChannel getSession(AccountInfo accountInfo) {
+        Logger.debugLogging("session sessionCount:"+session.sessionCount());
         return session.getAccountConnectedSocket(accountInfo);
+    }
+
+    public AccountInfo getUserInfoById(String inviteid) {
+        AccountInfo info = null;
+
+        for(String key : cache.getKeySet()) {
+            AccountInfo temp = cache.get(key);
+            if(inviteid.equals(temp.getU_id()))
+                return temp;
+        }
+        String query = String.format("select * from infobase as i right join accountinfo as a on i.infoid=a.accountid where id='%s'", inviteid);
+        try {
+            ResultSet rs = DatabaseConnector.getConnector().select(query);
+            while(rs.next()) {
+                info = new AccountInfo(rs.getString("accountid"), rs.getString("id"), rs.getString("email"), "");
+            }
+            cache.put(info.getId(), info);
+        } catch (SQLException e) {
+            Logger.errorLogging(e);
+        }
+
+        return info;
     }
 
     /**
@@ -131,7 +158,7 @@ public class AccountManager extends ManagerBase {
         }
 
         private void sessionInit() {
-            DB db = DBMaker.newMemoryDB().transactionDisable().closeOnJvmShutdown().make();
+            DB db = DBMaker.newMemoryDirectDB().transactionDisable().closeOnJvmShutdown().make();
             sessionAccount = db.getTreeMap(SESSION);
             accountSession = db.getTreeMap(ACCOUNTSESSION);
         }
@@ -158,6 +185,7 @@ public class AccountManager extends ManagerBase {
         public void put(SocketChannelWrapper scw, AccountInfo newAccount) {
             sessionAccount.put(scw, newAccount);
             accountSession.put(newAccount, scw);
+            Logger.debugLogging(String.format("sessionAccount sessionCount %d accountSession %d", sessionAccount.size(), accountSession.size()));
         }
 
         /**
@@ -167,8 +195,7 @@ public class AccountManager extends ManagerBase {
          * @param newAccount
          */
         public void put(SocketChannel sc, AccountInfo newAccount) {
-            sessionAccount.put(new SocketChannelWrapper(sc), newAccount);
-            accountSession.put(newAccount, new SocketChannelWrapper(sc));
+            put(new SocketChannelWrapper(sc), newAccount);
         }
 
         /**
@@ -176,10 +203,20 @@ public class AccountManager extends ManagerBase {
          * @param sc
          */
         public void remove(SocketChannel sc) {
+            AccountInfo accountInfo = get(sc);
+            if(accountInfo == null) {
+                Logger.errorLogging("accountInfo is empty", new NullPointerException());
+                return;
+            }
             // 로그아웃한 시간을 기록한다.
-            String logoutHistory = String.format("insert into history (jobtype, time, accountid) values('logout', now(), '%s');", get(sc).getId());
+            String logoutHistory = String.format("insert into history (jobtype, time, accountid) values('logout', now(), '%s');", accountInfo.getId());
             DatabaseConnector.getConnector().modify(logoutHistory);
+            accountSession.remove(accountInfo);
             sessionAccount.remove(new SocketChannelWrapper(sc));
+        }
+
+        public int sessionCount() {
+            return accountSession.size();
         }
     }
 
@@ -191,16 +228,17 @@ public class AccountManager extends ManagerBase {
         }
 
         private void initCache() {
-            cache = DBMaker.newMemoryDB().transactionDisable().closeOnJvmShutdown().make().getTreeMap(DBNAME);
+            cache = DBMaker.newMemoryDirectDB().transactionDisable().closeOnJvmShutdown().make().getTreeMap(DBNAME);
         }
 
         public AccountInfo get(String accountId) {
             AccountInfo accountInfo = cache.get(accountId);
             if(accountInfo == null) {
                 try {
-                    ResultSet rs = DatabaseConnector.getConnector().select(String.format("select i.infoid, a.id, i.name, a.email \n" +
+                    String serarchQuery = String.format("select i.infoid, a.id, i.name, a.email \n" +
                             "from infobase as i right join accountinfo as a \n" +
-                            "on a.accountid = i.infoid where a.id='%s';", accountId));
+                            "on a.accountid = i.infoid where a.accountid='%s';", accountId);
+                    ResultSet rs = DatabaseConnector.getConnector().select(serarchQuery);
                     while(rs.next()) {
                         accountInfo = new AccountInfo(rs.getString("infoid")
                         , rs.getString("id")
@@ -215,6 +253,10 @@ public class AccountManager extends ManagerBase {
             }
 
             return accountInfo;
+        }
+
+        public Set<String> getKeySet() {
+            return cache.keySet();
         }
 
         public void put(String id, AccountInfo newAccount) {

@@ -1,6 +1,9 @@
 package dropbox.server.Group;
 
+import dropbox.common.ByteConverter;
 import dropbox.common.Message;
+import dropbox.common.MessageType;
+import dropbox.common.MessageWrapper;
 import dropbox.server.Account.AccountInfo;
 import dropbox.server.Account.AccountManager;
 import dropbox.server.Base.ManagerBase;
@@ -11,7 +14,11 @@ import org.json.simple.JSONObject;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
+import javax.xml.crypto.Data;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.security.acl.Group;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -65,16 +72,42 @@ public class GroupManager extends ManagerBase {
         } else if("create".equals(subCategory)) {
             result = createGroup(sc, parsedObject);
         } else if("addmember".equals(subCategory)) {
-            result = addGroupMember(parsedObject);
+            result = addGroupMember(sc, parsedObject);
         } else if("change".equals(subCategory)) {
 
         } else if("exitgroup".equals(subCategory)) {
-
+            result = exitGroup(sc, parsedObject);
         } else if("delete".equals(subCategory)) {
-
+            result = deleteGroup(sc, parsedObject);
         }
 
         result.put(Message.SUBCATEGORY_KEY, subCategory);
+        return result;
+    }
+
+    private JSONObject deleteGroup(SocketChannel sc, JSONObject parsedObject) {
+        JSONObject result = new JSONObject();
+        String groupId = (String)parsedObject.get("groupid");
+        String deleteQuery = String.format("delete from infobase where infoid='%s';", groupId);
+        DatabaseConnector.getConnector().modify(deleteQuery);
+
+        result.put("result", DatabaseConnector.getConnector().modify(deleteQuery));
+        result.put("groupid", groupId);
+
+        return result;
+    }
+
+    private JSONObject exitGroup(SocketChannel sc, JSONObject parsedObject) {
+        JSONObject result = new JSONObject();
+        boolean res;
+        String groupId = (String)parsedObject.get("groupid");
+
+        AccountInfo loginInfo = AccountManager.getManager().getLoginInfo(sc);
+        String deleteQuery = String.format("select * from exitgroup('%s','%s');", loginInfo.getId(), groupId);
+        res = DatabaseConnector.getConnector().modify(deleteQuery);
+        result.put("groupid", groupId);
+        result.put("result", res);
+
         return result;
     }
 
@@ -118,18 +151,16 @@ public class GroupManager extends ManagerBase {
         JSONObject result = new JSONObject();
         try {
             ResultSet rs = DatabaseConnector.getConnector().select(
-                    String.format("select * from accountgroupinfo where userid='%s';", loginInfo.getId()));
+                    String.format("select * from accountgroupinfo('%s');", loginInfo.getId()));
             JSONArray arr = new JSONArray();
 
             while(rs.next()) {
                 JSONObject obj = new JSONObject();
                 obj.put("groupid", rs.getString("groupid"));
                 obj.put("groupname", rs.getString("groupname"));
-                obj.put("permission", rs.getString("permission"));
-                obj.put("accept", rs.getBoolean("accept"));
-                obj.put("comment", rs.getString("comment"));
+                obj.put("comment", rs.getString("groupcomment"));
+                obj.put("mastername", rs.getString("mastername"));
                 obj.put("masterid", rs.getString("masterid"));
-                obj.put("mastername", rs.getString("masteruid"));
 
                 arr.add(obj);
             }
@@ -140,17 +171,43 @@ public class GroupManager extends ManagerBase {
         return result;
     }
 
-    private JSONObject addGroupMember(JSONObject parsedObject) {
+    private JSONObject addGroupMember(SocketChannel sc, JSONObject parsedObject) {
         JSONObject result;
         result = new JSONObject();
-        GroupInfo target = cache.get((String)parsedObject.get("groupid"));
-        GroupMemberInfo groupMember = new GroupMemberInfo(
-                target
-                , AccountManager.getManager().getUserInfo((String)parsedObject.get("inviteId"))
-                ,'U'
-                ,false);
-        target.addGroupMember(groupMember);
-        result.put("result", DatabaseConnector.getConnector().insert(groupMember));
+        String groupid = (String)parsedObject.get("groupid");
+        String inviteid = (String)parsedObject.get("inviteid");
+        boolean res = false;
+
+        if(groupid.trim().length() > 0 && inviteid.trim().length() > 0) {
+            GroupInfo target = cache.get(groupid);
+            GroupMemberInfo groupMember = new GroupMemberInfo(
+                    target
+                    , AccountManager.getManager().getUserInfoById(inviteid)
+                    , 'U'
+                    , false);
+            target.addGroupMember(groupMember);
+            res = memberCache.addUser(target.getId(), groupMember);
+            result.put("groupname", target.getName());
+        }
+        result.put("groupid", groupid);
+        result.put("inviteid",inviteid);
+        result.put(Message.SUBCATEGORY_KEY, "addmember");
+        result.put("result", res);
+        if(res) {
+            try {
+                AccountManager manager = AccountManager.getManager();
+                sc = manager.getSession(manager.getUserInfoById(inviteid));
+                if(sc != null) {
+                    Message msg = new Message();
+                    msg.messageType = MessageType.Group;
+                    msg.msg = result.toJSONString();
+                    sc.write(ByteBuffer.wrap(MessageWrapper.messageToByteArray(msg)));
+                }
+
+            } catch (IOException e) {
+                Logger.errorLogging(e);
+            }
+        }
         return result;
     }
 
@@ -209,7 +266,7 @@ public class GroupManager extends ManagerBase {
         }
 
         private void initCache() {
-            DB db = DBMaker.newMemoryDB().transactionDisable().closeOnJvmShutdown().make();
+            DB db = DBMaker.newMemoryDirectDB().transactionDisable().closeOnJvmShutdown().make();
             cache = db.getTreeMap(GroupManager.DBNAME);
         }
 
@@ -244,9 +301,11 @@ public class GroupManager extends ManagerBase {
         }
 
         private void initCache() {
-            DB db = DBMaker.newMemoryDB().transactionDisable().closeOnJvmShutdown().make();
-            cache=db.getTreeMap(MEMBERLIST_DBNAME);
+            DB db = DBMaker.newMemoryDirectDB().transactionDisable().closeOnJvmShutdown().make();
+            cache=db.getTreeMap(GroupManager.MEMBERLIST_DBNAME);
         }
+
+
 
         public List<GroupMemberInfo> get(String groupId) {
             List<GroupMemberInfo> list = cache.get(groupId);
@@ -276,12 +335,12 @@ public class GroupManager extends ManagerBase {
             cache.put(groupId, memberInfoList);
         }
 
-        public void addUser(String groupId, GroupMemberInfo memberInfo) {
+        public boolean addUser(String groupId, GroupMemberInfo memberInfo) {
             List<GroupMemberInfo> list = get(groupId);
             list.add(memberInfo);
 
             DatabaseConnector dbConn = DatabaseConnector.getConnector();
-            dbConn.insert(memberInfo);
+            return dbConn.insert(memberInfo);
         }
     }
 }

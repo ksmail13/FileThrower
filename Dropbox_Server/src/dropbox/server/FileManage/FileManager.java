@@ -42,45 +42,65 @@ public class FileManager extends ManagerBase {
         String subCategory = (String) parsedObject.get(Message.SUBCATEGORY_KEY);
         if("upload".equals(subCategory)) {
             result = uploadFile(AccountManager.getManager().getLoginInfo(sc), parsedObject);
-        } else if("sync".equals(subCategory)) {
-            result = checkFile(AccountManager.getManager().getLoginInfo(sc), parsedObject);
+        } else if("syncall".equals(subCategory)) {
+            result = checkFile(sc, parsedObject);
         } else if("upcomplete".equals(subCategory)) {
-            result = uploadComplete(AccountManager.getManager().getLoginInfo(sc), parsedObject);
+            result = uploadComplete(sc, parsedObject);
         }
-//        else if("addmember".equals(subCategory)) {
-//        } else if("change".equals(subCategory)) {
-//        } else if("exitgroup".equals(subCategory)) {
-//        } else if("delete".equals(subCategory)) {
-//        }
+        else if("delete".equals(subCategory)) {
+            result = deleteFile(sc, parsedObject);
+        }
 
         result.put(Message.SUBCATEGORY_KEY, subCategory);
         return result;
 
     }
 
-    private JSONObject checkFile(AccountInfo loginInfo, JSONObject parsedObject) {
+    private JSONObject deleteFile(SocketChannel sc, JSONObject parsedObject) {
         JSONObject res = new JSONObject();
-        String loginId = loginInfo.getId();
+        String filename = (String)parsedObject.get("filename");
+        String groupid = (String)parsedObject.get("groupid");
 
+        String deleteQuery = String.format("delete from infobase where name='%s' and infoid=(select fileid from fileinfo where groupid='%s')", filename, groupid);
+        DatabaseConnector.getConnector().modify(deleteQuery);
+
+        res.put("filename", filename);
+        res.put("groupid", groupid);
 
         return res;
     }
 
-    private JSONObject uploadComplete(AccountInfo loginInfo, JSONObject parsedObject) {
+    private JSONObject checkFile(SocketChannel sc, JSONObject parsedObject) {
+        JSONObject res = new JSONObject();
+
+        return res;
+    }
+
+    private JSONObject uploadComplete(SocketChannel sc, JSONObject parsedObject) {
         JSONObject res = new JSONObject();
         String groupId = (String) parsedObject.get("groupid");
         List<GroupMemberInfo> memberList = GroupManager.getManager().getGroupMemberList(groupId);
 
+        String query = String.format("update fileinfo set uploadcomplete='true' where fileid in (select fileid from filefullinfo where groupid='%s' and name='%s')",groupId, parsedObject.get("filename"));
+        DatabaseConnector.getConnector().modify(query);
+
         for (GroupMemberInfo info : memberList) {
-            SocketChannel sc = AccountManager.getManager().getSession(info.getAccountInfo());
-
-            DatabaseConnector.getConnector().modify("update fileinfo set uploadcomplete='true' where groupid='%s' and ");
-
+            // 현재 연결되어 있는 다른 그룹원소켓
+            AccountInfo accountInfo = info.getAccountInfo();
+            SocketChannel tsc = AccountManager.getManager().getSession(accountInfo);
+            if(tsc == null){
+                Logger.errorLogging("Target "+accountInfo.getU_id()+" Socket is ", new NullPointerException());
+                continue;
+            }
+            parsedObject.put(Message.SUBCATEGORY_KEY, "sync");
+            parsedObject.put("groupname", info.getGroupInfo().getName());
             Message msg = new Message();
             msg.messageType = MessageType.File;
             msg.msg = parsedObject.toJSONString();
+
+            Logger.debugLogging(String.format("sync file Message to %s:%s by %s\nfile Info %s", accountInfo.getId(), accountInfo.getU_id(), tsc, msg.msg));
             try {
-                sc.write(ByteBuffer.wrap(MessageWrapper.messageToByteArray(msg)));
+                tsc.write(ByteBuffer.wrap(MessageWrapper.messageToByteArray(msg)));
             } catch (IOException e) {
                 Logger.errorLogging(e);
             }
@@ -93,14 +113,18 @@ public class FileManager extends ManagerBase {
         try {
             String fileName = (String) parsedObject.get("filename");
             String groupId = (String) parsedObject.get("groupid");
-            Long fileSize = (Long) parsedObject.get("filesize");
+            Long fileSize = (Long)parsedObject.get("filesize");
 
             DatabaseConnector dbConn = DatabaseConnector.getConnector();
-            dbConn.insert(new FileInfo(FileInfo.keyGenerate(), fileName, fileSize, Calendar.getInstance().getTime(), groupId, false));
+            FileInfo newfile = new FileInfo(FileInfo.keyGenerate(), fileName, fileSize, groupId, false);
+            dbConn.insert(newfile);
 
             res.put("result", true);
-
+            res.put("fileid", newfile.getId());
+            res.put("filename", newfile.getName());
+            res.put("groupid", newfile.groupId);
         } catch (Exception e) {
+            Logger.errorLogging(e);
             res.put("result", false);
         }
 

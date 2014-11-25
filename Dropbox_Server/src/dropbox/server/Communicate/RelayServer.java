@@ -1,17 +1,15 @@
 package dropbox.server.Communicate;
 
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
+import dropbox.common.ByteConverter;
 import dropbox.common.Message;
 import dropbox.common.MessageWrapper;
 import dropbox.server.Account.AccountInfo;
 import dropbox.server.Account.AccountManager;
 import dropbox.server.FileManage.FileManager;
 import dropbox.server.Group.GroupManager;
-import dropbox.common.ByteConverter;
 import dropbox.server.Util.Logger;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.nio.ByteBuffer;
@@ -30,12 +28,6 @@ public class RelayServer implements Runnable{
     // static end
 
     private Selector selector = null;
-    private ServerSocketChannel serverSockChennel = null;
-    private ServerSocket serverSocket = null;
-
-    private GroupManager groupManager = null;
-    private FileManager fileManager = null;
-    private AccountManager accountManager = null;
 
     private Thread relayThread = null;
 
@@ -56,9 +48,9 @@ public class RelayServer implements Runnable{
     private void initServer(InetSocketAddress serverSocketAddress) {
         try {
             selector = Selector.open();
-            serverSockChennel = ServerSocketChannel.open();
+            ServerSocketChannel serverSockChennel = ServerSocketChannel.open();
             serverSockChennel.configureBlocking(false);
-            serverSocket = serverSockChennel.socket();
+            ServerSocket serverSocket = serverSockChennel.socket();
 
             serverSocket.bind(serverSocketAddress);
 
@@ -154,7 +146,7 @@ public class RelayServer implements Runnable{
         try {
             int read =0;
             int readbytes = 0;
-            int messageSize = 1000000;
+            int messageSize = 10000;
             boolean firstread = true;
 
             // 현재 소켓의 수신이 가능하고 전체 메시지 길이 보다 전체
@@ -173,6 +165,7 @@ public class RelayServer implements Runnable{
                 if(firstread) {
                     byte[] temp = buffer.array();
                     messageSize = ByteConverter.byteArrayToInt(temp[0], temp[1], temp[2], temp[3]);
+                    if(messageSize> 10000) messageSize=10000;
                     firstread = false;
                 }
 
@@ -202,6 +195,7 @@ public class RelayServer implements Runnable{
             switch (msg.messageType) {
                 // file request
                 case File:
+                    FileManager.getManager().receiveMessage(sc, msg);
                     break;
                 // account request
                 case Account:
@@ -228,25 +222,28 @@ public class RelayServer implements Runnable{
     public void run() {
         Logger.logging("Server Start");
 
-        try {
-            while(true) {
+        while(true) {
+
+            try {
                 Logger.logging("selecting!");
                 selector.select();
                 Iterator<SelectionKey> kit = selector.selectedKeys().iterator();
                 while (kit.hasNext()) {
                     SelectionKey selectKey = kit.next();
-                    if(selectKey.isAcceptable()) {
+                    if (selectKey.isAcceptable()) {
                         connectAcceptClient(selectKey);
-                    }
-                    else if(selectKey.isReadable()){
+                    } else if (selectKey.isReadable()) {
                         receiveMessage(selectKey);
                     }
                     kit.remove();
                 }
+
+            } catch(IOException ioe) {
+                Logger.errorLogging(ioe);
+            } catch (Exception e) {
+                Logger.errorLogging(e);
             }
-        }
-        catch(IOException ioe) {
-            Logger.errorLogging("", ioe);
         }
     }
 }
+

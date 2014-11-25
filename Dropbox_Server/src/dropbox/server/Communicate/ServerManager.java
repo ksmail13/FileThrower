@@ -21,18 +21,15 @@ public class ServerManager {
         return managerInstance;
     }
 
-    private RelayServer relayServer;
-    private FileServer fileServer;
-
 
     private ServerManager() {}
 
     public void startServer() {
 
-        relayServer = new RelayServer(DEFAULT_IP, DEFAULT_PORT);
+        RelayServer relayServer = new RelayServer(DEFAULT_IP, DEFAULT_PORT);
         relayServer.startServer();
 
-        fileServer = new FileServer(DEFAULT_PORT+1);
+        FileServer fileServer = new FileServer(DEFAULT_PORT + 1);
         fileServer.startServer();
     }
 

@@ -161,7 +161,7 @@ public class DB implements Closeable {
 
 
 
-        /** by default collection does not have counter, without counter updates are faster, but entire collection needs to be traversed to count items.*/
+        /** by default collection does not have counter, without counter updates are faster, but entire collection needs to be traversed to sessionCount items.*/
         public HTreeMapMaker counterEnable(){
             this.counter = true;
             return this;
@@ -294,7 +294,7 @@ public class DB implements Closeable {
         protected boolean pumpIgnoreDuplicates = false;
 
 
-        /** by default collection does not have counter, without counter updates are faster, but entire collection needs to be traversed to count items.*/
+        /** by default collection does not have counter, without counter updates are faster, but entire collection needs to be traversed to sessionCount items.*/
         public HTreeSetMaker counterEnable(){
             this.counter = true;
             return this;
@@ -679,7 +679,7 @@ public class DB implements Closeable {
             return this;
         }
 
-        /** by default collection does not have counter, without counter updates are faster, but entire collection needs to be traversed to count items.*/
+        /** by default collection does not have counter, without counter updates are faster, but entire collection needs to be traversed to sessionCount items.*/
         public BTreeMapMaker counterEnable(){
             this.counter = true;
             return this;
@@ -789,7 +789,7 @@ public class DB implements Closeable {
         }
 
 
-        /** by default collection does not have counter, without counter updates are faster, but entire collection needs to be traversed to count items.*/
+        /** by default collection does not have counter, without counter updates are faster, but entire collection needs to be traversed to sessionCount items.*/
         public BTreeSetMaker counterEnable(){
             this.counter = true;
             return this;

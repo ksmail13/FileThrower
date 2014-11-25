@@ -10,7 +10,9 @@ import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
 import org.apache.ftpserver.usermanager.impl.BaseUser;
 import org.apache.ftpserver.usermanager.impl.WritePermission;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,8 +52,8 @@ public class FileServer {
         public FtpletResult beforeCommand(FtpSession session, FtpRequest request)
                 throws FtpException, IOException
         {
-            Logger.logging("beforeCommand " + session.getUserArgument() + " : " + session.toString() + " | " + request.getArgument() + " : " + request.getCommand() + " : " + request.getRequestLine());
-            Logger.logging("Thread #" + Thread.currentThread().getId());
+            //Logger.logging("beforeCommand " + session.getUserArgument() + " : " + session.toString() + " | " + request.getArgument() + " : " + request.getCommand() + " : " + request.getRequestLine());
+            //Logger.logging("Thread #" + Thread.currentThread().getId());
 
             //do something
             return FtpletResult.DEFAULT;//...or return accordingly

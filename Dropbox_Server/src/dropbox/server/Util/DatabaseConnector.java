@@ -1,6 +1,7 @@
 package dropbox.server.Util;
 
 import dropbox.server.Base.Queriable;
+import sun.rmi.runtime.Log;
 
 import java.sql.*;
 
@@ -18,8 +19,8 @@ public class DatabaseConnector {
         return connector;
     }
 
-    public final static String DB_ADDR = "jdbc:postgresql://10.0.27.234:5432/dropbox";
-    //public final static String DB_ADDR = "jdbc:postgresql://1920.168.0.25:5432/dropbox";
+    public final static String DB_ADDR = "jdbc:postgresql://10.0.29.4:5432/dropbox";
+//    public final static String DB_ADDR = "jdbc:postgresql://192.168.0.25:5432/dropbox";
     public final static String ID = "postgres";
     public final static String PASSWORD = "qufdmltnarufdldu";
 
@@ -44,8 +45,9 @@ public class DatabaseConnector {
 
     public ResultSet select(String selectquery) throws SQLException {
         Statement st = conn.createStatement();
-        ResultSet rs = st.executeQuery(selectquery);
-        return rs;
+        selectquery = selectquery.trim();
+        Logger.debugLogging("select query :"+selectquery);
+        return st.executeQuery(selectquery);
     }
 
     public boolean modify(String query) {
@@ -54,6 +56,7 @@ public class DatabaseConnector {
 
     public boolean modify(String query, boolean commit) {
         boolean result = false;
+        query = query.trim();
         Logger.logging("modify query:" +query);
         try {
             PreparedStatement pst = conn.prepareStatement(query);
@@ -62,6 +65,11 @@ public class DatabaseConnector {
             if(commit) commit();
         } catch (SQLException e) {
             Logger.errorLogging(e);
+            try {
+                rollback();
+            } catch (SQLException e1) {
+                Logger.errorLogging(e1);
+            }
         }
 
         return result;

@@ -8,7 +8,7 @@ import java.io.Serializable;
  * Created by micky on 2014. 11. 21..
  *
  */
-public abstract class InfoBase implements Queriable, Serializable {
+public abstract class InfoBase implements Queriable, Serializable, Comparable {
     protected final String id;
     protected final String name;
 
@@ -39,5 +39,10 @@ public abstract class InfoBase implements Queriable, Serializable {
     public boolean equals(Object obj) {
         InfoBase oth = (obj instanceof InfoBase)?(InfoBase)obj:null;
         return oth != null && this.id.equals(oth.id);
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return this.hashCode()-o.hashCode();
     }
 }
