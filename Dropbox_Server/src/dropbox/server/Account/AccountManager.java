@@ -12,8 +12,10 @@ import org.mapdb.DBMaker;
 import java.nio.channels.SocketChannel;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by micky on 2014. 11. 21..
@@ -159,8 +161,11 @@ public class AccountManager extends ManagerBase {
 
         private void sessionInit() {
             DB db = DBMaker.newMemoryDirectDB().transactionDisable().closeOnJvmShutdown().make();
-            sessionAccount = db.getTreeMap(SESSION);
-            accountSession = db.getTreeMap(ACCOUNTSESSION);
+//            sessionAccount = db.getTreeMap(SESSION);
+//            accountSession = db.getTreeMap(ACCOUNTSESSION);
+
+            sessionAccount = new HashMap<SocketChannelWrapper, AccountInfo>();
+            accountSession = new HashMap<AccountInfo, SocketChannelWrapper>();
         }
 
         public AccountInfo get(SocketChannelWrapper scw) {

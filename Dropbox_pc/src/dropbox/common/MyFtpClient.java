@@ -1,12 +1,20 @@
 package dropbox.common;
 
 import java.io.*;
+import java.net.UnknownHostException;
+
+import javax.swing.table.DefaultTableModel;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.oroinc.net.ftp.*;
 import com.oroinc.net.*;
 
+import dropbox.ui.ManagerFrame;
+
 public class MyFtpClient {
-    static String server = "192.168.0.4";
+    static String server = "10.0.26.191";
     static int port = 8081;
     static String id = "test";
     static String password = "test";
@@ -84,10 +92,10 @@ public class MyFtpClient {
     }
 
     // 파일을 전송 받는다
-    public File get(String dir, String groupName, String fileName) {
+    public File get(String dir, String groupName, String groupId, String fileName) {
         OutputStream output = null;
         String source = dir+"/"+groupName+"/"+fileName;
-        String target = "/"+groupName+"/"+fileName;
+        String target = "/"+groupId+"/"+fileName;
         try {
             File local = new File(source);
             output = new FileOutputStream(local);
@@ -99,6 +107,7 @@ public class MyFtpClient {
         File file = new File(target);
         try {
             if (ftpClient.retrieveFile(target, output)) {
+            	ftpClient.disconnect();
                 return file;
             }
         }
@@ -109,9 +118,9 @@ public class MyFtpClient {
     }
     
     //파일 전송 
-    public void send(String dir, String groupName, String fileName) throws IOException{
+    public void send(String dir, String groupId, String fileName) throws IOException, JSONException{
     	String source = dir+"/"+fileName;
-    	String target = "/"+groupName+"/"+fileName;
+    	String target = "/"+groupId+"/"+fileName;
     	
     	System.out.println("Transmit Ori : " + source);
     	System.out.println("To server : " + target);
@@ -119,22 +128,47 @@ public class MyFtpClient {
     	//File put_file = new File(source); // 저장시켰던 파일을 서버로 전송
         //InputStream inputStream = new FileInputStream(put_file);
     	FileInputStream fis = new FileInputStream(source);
+    	ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
     	
     	try{
     		if(!ftpClient.storeFile(target, fis)){
     			System.out.println("Excep, makedir");
-        		ftpClient.makeDirectory("/"+groupName);
+        		ftpClient.makeDirectory("/"+groupId);
         		ftpClient.storeFile(target, fis);
     		}
     	}
     	catch(com.oroinc.io.CopyStreamException cse){
     		System.out.println("Excep, makedir");
-    		ftpClient.makeDirectory("/"+groupName);
+    		ftpClient.makeDirectory("/"+groupId);
     		ftpClient.storeFile(target, fis);
     	}
     	
         fis.close();
         ftpClient.disconnect();
+        
+        JSONObject fileCompleteJObj = new JSONObject();
+
+        fileCompleteJObj.put("filename", fileName);
+        fileCompleteJObj.put("groupid", groupId);
+        fileCompleteJObj.put(Message.SUBCATEGORY_KEY, "upcomplete");
+
+		System.out.println("FILE COMPLETE : " + fileCompleteJObj);
+
+		Message msg = new Message();
+		msg.messageType = MessageType.File;
+		msg.msg = fileCompleteJObj.toString();
+
+		try {
+			MySocket ms = MySocket.getConnector();
+			ms.send(msg);
+		} catch (UnknownHostException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+        
     }
 
     // 서버 디렉토리 이동

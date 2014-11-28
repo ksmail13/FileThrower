@@ -122,14 +122,7 @@ public class ManagerFrame extends JFrame implements MouseListener,
 
 		DefaultTableModel historyTableModel = new DefaultTableModel(
 				new String[] { "Contents", "" }, 0);
-		historyTableModel.addRow(new Object[] { "Do Yo Wanna Join 'Group'?",
-				"Yes" });
-		historyTableModel.addRow(new Object[] { "File Transmit 'Group/File'",
-				"Check" });
-		historyTableModel.addRow(new Object[] { "File Delete 'Group/File'",
-				"Check" });
-		historyTableModel.addRow(new Object[] { "Do Yo Wanna Join 'Group'?",
-				"Yes" });
+		
 
 		JTable historyTable = new JTable(historyTableModel);
 		historyTable.getTableHeader().setReorderingAllowed(false);
@@ -186,24 +179,21 @@ public class ManagerFrame extends JFrame implements MouseListener,
 		if (e.getActionCommand().equals("Create New Group")) {
 			createGroupFrame = new CreateGroupFrame();
 		} else if (e.getActionCommand().equals("Invite")) {
-			JOptionPane.showMessageDialog(null, "is exited user?");
 			String newMemberID = newMemberField.getText().trim();
+			if(newMemberID.equals("")){
+				JOptionPane
+				.showMessageDialog(null,
+						"Please don't enter empty id.");
+			}
 			try {
-				new GroupManager(GroupManager.INVITE, selectedGroupName,
-						selectedGroupLeader, newMemberID);
+				new GroupManager(GroupManager.INVITE, selectedGroupId, selectedGroupLeader, newMemberID);
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		} else if (e.getActionCommand().equals("Exit Group")) {
-			if (id.equals(selectedGroupLeader)) {
-				JOptionPane
-						.showMessageDialog(null,
-								"You are leader of the group.\n Leader can't exit group.");
-				return;
-			}
 			try {
-				new GroupManager(GroupManager.EXIT_GROUP, selectedGroupName,
+				new GroupManager(GroupManager.EXIT_GROUP, selectedGroupId,
 						selectedGroupLeader, "");
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block
@@ -216,7 +206,7 @@ public class ManagerFrame extends JFrame implements MouseListener,
 				return;
 			}
 			try {
-				new GroupManager(GroupManager.DELETE_GROUP, selectedGroupName,
+				new GroupManager(GroupManager.DELETE_GROUP, selectedGroupId,
 						selectedGroupLeader, "");
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block

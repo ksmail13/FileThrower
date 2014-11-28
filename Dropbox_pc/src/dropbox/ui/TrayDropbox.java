@@ -10,7 +10,7 @@ import dropbox.filemanage.DirectoryWatch;
 
 public class TrayDropbox {
 	private static ManagerFrame managerFrame;
-	private static DirectoryWatch directoryWatch;
+	public static DirectoryWatch directoryWatch;
 
 	private static MenuItem openItem;
 	private static MenuItem turnOnItem;
@@ -21,12 +21,12 @@ public class TrayDropbox {
 	
 	public TrayDropbox(File dir, String id) {
 		managerFrame = new ManagerFrame(id);
-		directoryWatch = new DirectoryWatch(dir);
-		directoryWatch.StartMonitoring();
-		this.id = id;
 
+		this.id = id;
 		createAndShowGUI();
 		turnOnItem.setEnabled(false);
+		directoryWatch = DirectoryWatch.getWather(dir);
+		directoryWatch.StartMonitoring();
 	}
 
 	private static void createAndShowGUI() {

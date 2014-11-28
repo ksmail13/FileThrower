@@ -17,12 +17,19 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Text"
         android:id="@+id/master_text"
         android:layout_below="@+id/name_text"
         android:layout_alignParentEnd="true" />
 
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text=""
+        android:id="@+id/real_id"
+        android:layout_alignBottom="@+id/master_text"
+        android:layout_alignParentStart="true"
+        android:textSize="1dp" />
 
 
 </RelativeLayout>

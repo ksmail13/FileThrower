@@ -15,7 +15,7 @@ import dropbox.common.MessageType;
 import dropbox.common.MySocket;
 
 public class SignUpFrame extends JFrame {
-	private SignUpFrame sf;
+	public static SignUpFrame sf;
 	private SignUpPanel signUpPanel;
 
 	private JTextField idField;
@@ -25,7 +25,7 @@ public class SignUpFrame extends JFrame {
 
 	public SignUpFrame() {
 		sf = this;
-		setSize(420, 190);
+		setSize(350, 190);
 		setTitle("Dropbox Sign Up");
 		signUpPanel = new SignUpPanel();
 		add(signUpPanel);
@@ -42,8 +42,6 @@ public class SignUpFrame extends JFrame {
 
 			JLabel idLabel = new JLabel("ID");
 			idField = new JTextField(15);
-			JButton dupChkButton = new JButton("Check avail.");
-			dupChkButton.addActionListener(this);
 			JLabel passwdLabel = new JLabel("Password");
 			passwdField = new JPasswordField(15);
 			JLabel rePasswdLabel = new JLabel("Re-Password");
@@ -68,7 +66,6 @@ public class SignUpFrame extends JFrame {
 
 			Box idSubBox = Box.createHorizontalBox();
 			idSubBox.add(idField);
-			idSubBox.add(dupChkButton);
 
 			rightBox.add(idSubBox);
 			rightBox.add(passwdField);

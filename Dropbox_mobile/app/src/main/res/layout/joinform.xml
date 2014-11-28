@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/input_email"
         android:layout_centerHorizontal="true"
-        android:inputType="textEmailAddress"
+        android:inputType="textVisiblePassword"
         android:layout_below="@+id/text_name"
         />
 
@@ -32,6 +32,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/input_id"
         android:layout_below="@+id/text_id"
+        android:inputType="textVisiblePassword"
         android:layout_centerHorizontal="true" />
 
     <EditText

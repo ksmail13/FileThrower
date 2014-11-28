@@ -1,16 +1,46 @@
 package dropbox.filemanage;
 
 import java.nio.file.*;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.io.*;
 
 public class DirectoryWatch {
-	private File rootDir;
+	private static DirectoryWatch watcher;
+	
+	public static DirectoryWatch getWather(File dir) {
+		if(watcher == null)
+			watcher = new DirectoryWatch(dir);
+		return watcher;
+	}
+	
+	public static DirectoryWatch getWatcher() {
+		if(watcher == null)
+			throw new NullPointerException();
+		return watcher;
+	}
+	
+	private HashMap<String, WatchThread> watchManager;
+	
+	public WatchThread getWatchThread(String groupId) {
+		return watchManager.get(groupId);
+	}
+	
+	public void addWatchThread(String groupName) {
+		WatchThread thread = new WatchThread(rootDir.toPath(), groupName);
+		thread.setName(groupName);
+		thread.start();
+		watchManager.put(groupName,  thread);
+	}
+	
+	private static File rootDir;
 	private File[] files;
-	private WatchThread[] watchThread;
+	private ArrayList<WatchThread> watchThreads;
 	private int folderCount;
-
-	public DirectoryWatch(File dir) {
+	
+	private DirectoryWatch(File dir) {
 		rootDir = dir;
 		files = dir.listFiles();
 
@@ -21,12 +51,16 @@ public class DirectoryWatch {
 			}
 		}
 		folderCount = num;
-		watchThread = new WatchThread[folderCount];
-		
+		//watchThread = new WatchThread[folderCount];
+		watchThreads = new ArrayList<WatchThread>();
+		watchManager = new HashMap<String, WatchThread>();
 		num = 0;
 		for (File file : files) {
 			if (file.listFiles() != null) {
-				watchThread[num] = new WatchThread(file.toPath(), file.getName());
+				WatchThread watchThread = new WatchThread(file.toPath(), file.getName());
+				watchThread.setName(file.getName());
+				watchManager.put(file.getName(), watchThread);
+				watchThreads.add(watchThread);
 				num++;
 			}
 		}
@@ -37,8 +71,8 @@ public class DirectoryWatch {
 		System.out.println(rootDir);
 		for (int i = 0; i < folderCount; i++) {
 			// It's a subdirectory
-			System.out.println(i + " Monitoring Start : " + watchThread[i].dir);
-			watchThread[i].start();
+			System.out.println(i + " Monitoring Start : " + watchThreads.get(i).getName());
+			watchThreads.get(i).start();
 		}
 	}
 	
@@ -47,8 +81,8 @@ public class DirectoryWatch {
 		System.out.println(rootDir);
 		for (int i = 0; i < folderCount; i++) {
 			// It's a subdirectory
-			System.out.println("Monitoring Start : " + watchThread[i].dir);
-			watchThread[i].resume();
+			System.out.println("Monitoring Start : " + watchThreads.get(i).getName());
+			watchThreads.get(i).resume();
 			
 		}
 	}
@@ -58,54 +92,8 @@ public class DirectoryWatch {
 		System.out.println(folderCount);
 		
 		for (int i = 0; i < folderCount; i++) {
-			System.out.println("Monitoring Stop : " + watchThread[i].dir);
-			watchThread[i].suspend();
-		}
-	}
-
-	public void testForDirectoryChange(Path myDir, String groupName) {
-		while (true) {
-			try {
-				WatchService watcher = myDir.getFileSystem().newWatchService();
-				myDir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE,
-						StandardWatchEventKinds.ENTRY_DELETE,
-						StandardWatchEventKinds.ENTRY_MODIFY);
-
-				WatchKey watckKey = watcher.take();
-
-				List<WatchEvent<?>> events = watckKey.pollEvents();
-				for (WatchEvent event : events) {
-					if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
-						System.out.println("Group : " + groupName + " Created: " + myDir + "/" + event.context().toString());
-						new FileSynchronize(event, groupName, myDir, event.context().toString().trim());
-					}
-					if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
-						System.out.println("Group : " + groupName + " Delete: " + myDir + "/" + event.context().toString());
-						new FileSynchronize(event, groupName, myDir, event.context().toString().trim());
-					}
-					if (event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
-						System.out.println("Group : " + groupName + " Modify: " + myDir + "/" + event.context().toString());
-						new FileSynchronize(event, groupName, myDir, event.context().toString().trim());
-					}
-				}
-
-			} catch (Exception e) {
-				System.out.println("Error: " + e.toString());
-			}
-		}
-	}
-
-	class WatchThread extends Thread {
-		private Path dir;
-		private String groupName;
-		
-		public WatchThread(Path dir, String groupName) {
-			this.dir = dir;
-			this.groupName = groupName;
-		}
-
-		public void run() {
-			testForDirectoryChange(this.dir, this.groupName);
+			System.out.println("Monitoring Stop : " + watchThreads.get(i).getName());
+			watchThreads.get(i).suspend();
 		}
 	}
 }

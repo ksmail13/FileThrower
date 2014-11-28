@@ -15,13 +15,8 @@ public class UiMain {
 	public static LoginFrame loginFrame;
 
 	public static void main(String[] args) throws UnknownHostException, IOException, ParseException, JSONException {
-		// TODO Auto-generated method stub
 		ms = MySocket.getConnector();
 		loginFrame = new LoginFrame();
-		
-		//MyFtpClient myFtp = new MyFtpClient("10.0.25.186", 8081, "test", "test");
-		//System.out.println(myFtp.login("test", "test"));
-		//myFtp.send("/users/heejoongkim/monitor", "aaaddd", "asdf");
 		
 		ms.receive();
 	}

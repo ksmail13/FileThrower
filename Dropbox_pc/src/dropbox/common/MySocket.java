@@ -30,7 +30,7 @@ public class MySocket {
 	private Socket s;
 
 	private MySocket() throws UnknownHostException, IOException {
-		s = new Socket("10.0.25.186", 8080);
+		s = new Socket("10.0.26.191", 8080);
 		System.out.println("Socket Connected");
 	}
 
@@ -55,12 +55,23 @@ public class MySocket {
 			switch (msg.messageType) {
 			// file request
 			case File:
+				switch(subCategory){
+				case "upcomplete":
+					break;
+				case "sync":
+					ReceiveWork.getInstance().downloadFile(jobj);
+					break;
+				}
 				break;
 			// account request
 			case Account:
 				switch(subCategory){
 				case "login":
-					ReceiveWork.login(jobj);
+					ReceiveWork.getInstance().login(jobj);
+					break;
+				case "create":
+					ReceiveWork.getInstance().createAccount(jobj);
+					break;
 				}
 				// AccountManager.getManager().receiveMessage(sc, msg);
 				break;
@@ -68,11 +79,23 @@ public class MySocket {
 			case Group:
 				switch(subCategory){
 				case "create":
-					ReceiveWork.createGroup(jobj);
+					ReceiveWork.getInstance().createGroup(jobj);
+					break;
 				case "grouplist":
-					ReceiveWork.getGroupList(jobj);
+					ReceiveWork.getInstance().getGroupList(jobj);
+					break;
 				case "memberlist":
-					ReceiveWork.getMemberList(jobj);
+					ReceiveWork.getInstance().getMemberList(jobj);
+					break;
+				case "addmember":
+					ReceiveWork.getInstance().addMember(jobj);
+					break;
+				case "exitgroup":
+					ReceiveWork.getInstance().exitGroup(jobj);
+					break;
+				case "delete":
+					ReceiveWork.getInstance().deleteGroup(jobj);
+					break;
 				}
 				break;
 			}
@@ -93,8 +116,6 @@ public class MySocket {
 
 	public void receive() throws IOException, ParseException, JSONException {
 		System.out.println("recv start");
-		// 메모리를 직접할당해 가비지 컬렉션에 잡히지 않게 처리해
-		// 나중에 full gc에 걸리는 시간을 줄인다.
 		byte[] msgbuf = new byte[4096];
 		while (true) {
 			if (s.getInputStream().read(msgbuf, 0, 4096) != -1) {

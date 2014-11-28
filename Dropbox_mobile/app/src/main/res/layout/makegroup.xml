@@ -24,6 +24,7 @@
     <EditText
         android:layout_width="300dp"
         android:layout_height="wrap_content"
+        android:inputType="textVisiblePassword"
         android:id="@+id/input_name"
         android:layout_gravity="center_horizontal" />
 
@@ -39,6 +40,7 @@
         android:layout_width="300dp"
         android:layout_height="100dp"
         android:id="@+id/input_comment"
+        android:inputType="textVisiblePassword"
         android:layout_weight="0.18" />
 
     <Button

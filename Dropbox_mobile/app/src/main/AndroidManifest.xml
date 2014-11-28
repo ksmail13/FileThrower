@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.dropbox.john.Dropbox_Mobile"
+    package="dropbox.user_interface"
     >
 
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
@@ -13,7 +13,7 @@
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Black">
         <activity
-            android:name=".loginform"
+            android:name="dropbox.user_interface.loginform"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,22 +23,22 @@
         </activity>
 
         <activity
-            android:name=".filelistform"
+            android:name="dropbox.user_interface.filelistform"
             android:label="@string/app_name" >
         </activity>
 
         <activity
-            android:name=".groupform"
+            android:name="dropbox.user_interface.groupform"
             android:label="@string/app_name" >
         </activity>
 
         <activity
-            android:name=".joinform"
+            android:name="dropbox.user_interface.joinform"
             android:label="@string/app_name" >
         </activity>
 
         <activity
-            android:name=".inviteform"
+            android:name="dropbox.user_interface.inviteform"
             android:label="@string/app_name" >
         </activity>
 

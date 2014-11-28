@@ -77,8 +77,8 @@
             android:id="@+id/upload_button" />
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="1dp"
+            android:layout_height="1dp"
             android:text="Rename"
             android:textSize="15dp"
             android:id="@+id/rename_button" />
