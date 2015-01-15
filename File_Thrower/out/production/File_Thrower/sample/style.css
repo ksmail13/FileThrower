@@ -1,0 +1,8 @@
+.label{
+    -fx-font-size:10px;
+    -fx-font-family:"monaco"
+}
+
+#label {
+    -fx-fill: #0f0f0f;
+}

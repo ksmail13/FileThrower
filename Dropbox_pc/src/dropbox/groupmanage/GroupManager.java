@@ -1,17 +1,13 @@
 package dropbox.groupmanage;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import dropbox.common.Message;
 import dropbox.common.MessageType;
 import dropbox.common.MySocket;
-import dropbox.common.ReceiveWork;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.UnknownHostException;
 
 public class GroupManager {
 	public static final int INVITE = 0;

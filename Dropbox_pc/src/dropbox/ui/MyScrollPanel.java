@@ -1,7 +1,7 @@
 package dropbox.ui;
 
-import java.awt.Container;
-import javax.swing.JScrollPane;
+import javax.swing.*;
+import java.awt.*;
 
 public class MyScrollPanel extends JScrollPane {
 	JScrollPane scrollPanel;

@@ -2,7 +2,6 @@ package testpack;
 
 import java.nio.file.*;
 import java.util.List;
-import java.io.*;
 
 class WatchThread extends Thread{
 	private Path dir;

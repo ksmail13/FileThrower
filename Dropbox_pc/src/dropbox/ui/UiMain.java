@@ -1,13 +1,11 @@
 package dropbox.ui;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-
+import dropbox.common.MySocket;
 import org.json.JSONException;
 import org.json.simple.parser.ParseException;
 
-import dropbox.common.MyFtpClient;
-import dropbox.common.MySocket;
+import java.io.IOException;
+import java.net.UnknownHostException;
 
 
 public class UiMain {

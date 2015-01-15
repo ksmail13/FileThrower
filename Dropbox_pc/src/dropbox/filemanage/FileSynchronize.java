@@ -1,23 +1,20 @@
 package dropbox.filemanage;
 
+import dropbox.common.Message;
+import dropbox.common.MessageType;
+import dropbox.common.MyFtpClient;
+import dropbox.common.MySocket;
+import dropbox.ui.ManagerFrame;
+import org.json.JSONException;
+import org.json.simple.JSONObject;
+
+import javax.swing.table.DefaultTableModel;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
-
-import javax.swing.table.DefaultTableModel;
-
-import org.json.JSONException;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
-import dropbox.common.Message;
-import dropbox.common.MessageType;
-import dropbox.common.MyFtpClient;
-import dropbox.common.MySocket;
-import dropbox.ui.ManagerFrame;
 
 public class FileSynchronize {
 	

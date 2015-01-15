@@ -1,20 +1,16 @@
 package dropbox.common;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.simple.parser.ParseException;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import dropbox.ui.UiMain;
 
 public class MySocket {
 	private static MySocket ms = null;

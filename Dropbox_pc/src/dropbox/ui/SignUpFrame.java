@@ -1,18 +1,15 @@
 package dropbox.ui;
 
-import java.awt.GridLayout;
+import dropbox.common.Message;
+import dropbox.common.MessageType;
+import dropbox.common.MySocket;
+import org.json.simple.JSONObject;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.UnknownHostException;
-
-import javax.swing.*;
-
-import org.json.simple.JSONObject;
-
-import dropbox.common.Message;
-import dropbox.common.MessageType;
-import dropbox.common.MySocket;
 
 public class SignUpFrame extends JFrame {
 	public static SignUpFrame sf;

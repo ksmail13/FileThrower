@@ -1,17 +1,12 @@
 package dropbox.common;
 
-import java.io.*;
-import java.net.UnknownHostException;
-
-import javax.swing.table.DefaultTableModel;
-
+import com.oroinc.net.*;
+import com.oroinc.net.ftp.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.oroinc.net.ftp.*;
-import com.oroinc.net.*;
-
-import dropbox.ui.ManagerFrame;
+import java.io.*;
+import java.net.UnknownHostException;
 
 public class MyFtpClient {
     static String server = "10.0.26.191";

@@ -6,7 +6,6 @@ import dropbox.server.Util.DatabaseConnector;
 import dropbox.server.Util.Logger;
 import dropbox.server.Util.SocketChannelWrapper;
 import org.json.simple.JSONObject;
-import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
 import java.nio.channels.SocketChannel;
@@ -15,7 +14,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by micky on 2014. 11. 21..
@@ -160,7 +158,7 @@ public class AccountManager extends ManagerBase {
         }
 
         private void sessionInit() {
-            DB db = DBMaker.newMemoryDirectDB().transactionDisable().closeOnJvmShutdown().make();
+            //DB db = DBMaker.newMemoryDirectDB().transactionDisable().closeOnJvmShutdown().make();
 //            sessionAccount = db.getTreeMap(SESSION);
 //            accountSession = db.getTreeMap(ACCOUNTSESSION);
 

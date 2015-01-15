@@ -1,15 +1,11 @@
 package dropbox.ui;
 
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import dropbox.groupmanage.GroupManager;
+import org.json.JSONException;
 
 import javax.swing.*;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import dropbox.groupmanage.GroupManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class CreateGroupFrame extends JFrame implements ActionListener {
 	private JTextField groupNameField;

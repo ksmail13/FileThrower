@@ -1,12 +1,13 @@
 package dropbox.ui;
 
+import dropbox.filemanage.DirectoryWatch;
+
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.URL;
-import javax.swing.*;
-
-import dropbox.filemanage.DirectoryWatch;
 
 public class TrayDropbox {
 	private static ManagerFrame managerFrame;

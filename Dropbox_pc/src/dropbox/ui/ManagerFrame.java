@@ -1,25 +1,14 @@
 package dropbox.ui;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.MenuItem;
-import java.awt.PopupMenu;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.File;
+import dropbox.config.ButtonColumn;
+import dropbox.groupmanage.GroupManager;
+import org.json.JSONException;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import dropbox.config.ButtonColumn;
-import dropbox.groupmanage.GroupManager;
+import java.awt.*;
+import java.awt.event.*;
 
 public class ManagerFrame extends JFrame implements MouseListener,
 		ActionListener {

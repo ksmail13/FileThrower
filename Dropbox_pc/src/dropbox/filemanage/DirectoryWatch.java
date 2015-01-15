@@ -1,11 +1,8 @@
 package dropbox.filemanage;
 
-import java.nio.file.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.io.*;
 
 public class DirectoryWatch {
 	private static DirectoryWatch watcher;
